@@ -1,31 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { fabric } from "fabric";
 
-const Dog = () => {
-  const [canvas, setCanvas] = useState(null);
+const Dog = (props) => {
   let canvasRendered = false;
 
   useEffect(() => {
     if (!canvasRendered) {
-      setCanvas(initCanvas());
+      initCanvas();
       canvasRendered = true;
     }
   }, []);
 
   const initCanvas = () => {
-    const options = { width: "300", height: "300", backgroundColor: "pink" };
+    const options = {
+      width: "300",
+      height: "300",
+      backgroundColor: "pink",
+    };
 
-    return new fabric.Canvas("main-canvas", options);
+    const canvas = new fabric.Canvas("main-canvas", options);
+    createDog(canvas, props.dog);
+
+    return canvas;
   };
 
-  const createDog = () => {
-    const earUrl = getURL("ear1");
-    const headUrl = getURL("head1");
-    const muzzleUrl = getURL("muzzle1");
-    const rightEyeUrl = getURL("eye1");
-    const leftEyeUrl = getURL("eye1");
-    const mouthUrl = getURL("mouth1");
-    const noseUrl = getURL("nose1");
+  const createDog = (canvas, dog) => {
+    console.log(dog);
+    const earUrl = getURL(dog.ear.variant);
+    const headUrl = getURL(dog.head.variant);
+    const muzzleUrl = getURL(dog.muzzle.variant);
+    const rightEyeUrl = getURL(dog.rightEye.variant);
+    const leftEyeUrl = getURL(dog.leftEye.variant);
+    const mouthUrl = getURL(dog.mouth.variant);
+    const noseUrl = getURL(dog.nose.variant);
 
     const height = canvas.getHeight();
     const width = canvas.getWidth();
@@ -33,33 +40,54 @@ const Dog = () => {
     const centerY = height / 2;
     const centerX = width / 2;
 
-    loadSVG(earUrl, { top: centerY - 70, left: centerX, normalize: true }, 0);
-    loadSVG(headUrl, { top: centerY, left: centerX, normalize: true }, 1);
-    loadSVG(
+    loadPartSVG(
+      canvas,
+      earUrl,
+      { top: centerY - 70, left: centerX, normalize: true },
+      0
+    );
+    loadPartSVG(
+      canvas,
+      headUrl,
+      { top: centerY, left: centerX, normalize: true },
+      1
+    );
+    loadPartSVG(
+      canvas,
       muzzleUrl,
       { top: centerY + 40, left: centerX, normalize: true },
       2
     );
-    loadSVG(
+    loadPartSVG(
+      canvas,
       rightEyeUrl,
       { top: centerY - 10, left: centerX - 35, normalize: true },
       3
     );
-    loadSVG(
+    loadPartSVG(
+      canvas,
       leftEyeUrl,
       { top: centerY - 10, left: centerX + 35, normalize: true },
       4
     );
-    loadSVG(mouthUrl, { top: centerY + 40, left: centerX, normalize: true }, 5);
-    loadSVG(noseUrl, { top: centerY + 20, left: centerX, normalize: true }, 6);
-
+    loadPartSVG(
+      canvas,
+      mouthUrl,
+      { top: centerY + 40, left: centerX, normalize: true },
+      5
+    );
+    loadPartSVG(
+      canvas,
+      noseUrl,
+      { top: centerY + 20, left: centerX, normalize: true },
+      6
+    );
     canvas.renderAll();
   };
 
-  const loadSVG = (url, properties, zIndex) => {
+  const loadPartSVG = (canvas, url, properties, zIndex) => {
     fabric.loadSVGFromURL(url, (result, options) => {
       const vectorGroup = fabric.util.groupSVGElements(result, options);
-      canvas.add(vectorGroup);
 
       if (properties.normalize) {
         const height = vectorGroup.getScaledHeight();
@@ -70,6 +98,7 @@ const Dog = () => {
       }
 
       vectorGroup.set(properties);
+      canvas.add(vectorGroup);
       vectorGroup.moveTo(zIndex);
     });
   };
@@ -80,8 +109,12 @@ const Dog = () => {
 
   return (
     <div>
-      <canvas width="300" height="300" id="main-canvas" />
-      <button onClick={createDog}>add dogss</button>
+      <canvas
+        width="300"
+        height="300"
+        id="main-canvas"
+        style={{ borderRadius: "1em", border: "3px solid black" }}
+      />
     </div>
   );
 };
