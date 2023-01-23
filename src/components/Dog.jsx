@@ -15,17 +15,18 @@ const Dog = (props) => {
     const options = {
       width: "300",
       height: "300",
-      backgroundColor: "pink",
+      backgroundColor: "deepskyblue",
     };
 
     const canvas = new fabric.Canvas("main-canvas", options);
+    canvas.hoverCursor = "default";
+    canvas.selection = false;
     createDog(canvas, props.dog);
 
     return canvas;
   };
 
   const createDog = (canvas, dog) => {
-    console.log(dog);
     const earUrl = getURL(dog.ear.variant);
     const headUrl = getURL(dog.head.variant);
     const muzzleUrl = getURL(dog.muzzle.variant);
@@ -97,7 +98,11 @@ const Dog = (props) => {
         properties.left -= width / 2;
       }
 
-      vectorGroup.set(properties);
+      vectorGroup.set({
+        ...properties,
+        selectable: false,
+        hasControls: false,
+      });
       canvas.add(vectorGroup);
       vectorGroup.moveTo(zIndex);
     });
