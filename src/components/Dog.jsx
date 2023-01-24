@@ -27,13 +27,13 @@ const Dog = (props) => {
   };
 
   const createDog = (canvas, dog) => {
-    const earUrl = getURL(dog.ear.variant);
-    const headUrl = getURL(dog.head.variant);
-    const muzzleUrl = getURL(dog.muzzle.variant);
-    const rightEyeUrl = getURL(dog.rightEye.variant);
-    const leftEyeUrl = getURL(dog.leftEye.variant);
-    const mouthUrl = getURL(dog.mouth.variant);
-    const noseUrl = getURL(dog.nose.variant);
+    const earUrl = getVectorURL(dog.ear.variant);
+    const headUrl = getVectorURL(dog.head.variant);
+    const muzzleUrl = getVectorURL(dog.muzzle.variant);
+    const rightEyeUrl = getVectorURL(dog.rightEye.variant);
+    const leftEyeUrl = getVectorURL(dog.leftEye.variant);
+    const mouthUrl = getVectorURL(dog.mouth.variant);
+    const noseUrl = getVectorURL(dog.nose.variant);
 
     const height = canvas.getHeight();
     const width = canvas.getWidth();
@@ -68,7 +68,12 @@ const Dog = (props) => {
     loadPartSVG(
       canvas,
       leftEyeUrl,
-      { top: centerY - 10, left: centerX + 35, normalize: true },
+      {
+        top: centerY - 10,
+        left: centerX + 35,
+        normalize: true,
+        color: dog.leftEye.color,
+      },
       4
     );
     loadPartSVG(
@@ -87,7 +92,7 @@ const Dog = (props) => {
   };
 
   const loadPartSVG = (canvas, url, properties, zIndex) => {
-    fabric.loadSVGFromURL(url, (result, options) => {
+    fabric.loadSVGFromURL(url, async (result, options) => {
       const vectorGroup = fabric.util.groupSVGElements(result, options);
 
       if (properties.normalize) {
@@ -96,6 +101,14 @@ const Dog = (props) => {
 
         properties.top -= height / 2;
         properties.left -= width / 2;
+      }
+
+      if (properties.color) {
+        const response = await fetch(getConfigURL("eye1"));
+        const config = await response.json();
+        config.colorable.forEach((num) => {
+          result[num].set({ fill: properties.color });
+        });
       }
 
       vectorGroup.set({
@@ -108,8 +121,12 @@ const Dog = (props) => {
     });
   };
 
-  const getURL = (name) => {
+  const getVectorURL = (name) => {
     return new URL(`../assets/${name}.svg`, import.meta.url).href;
+  };
+
+  const getConfigURL = (name) => {
+    return new URL(`../assets/${name}.json`, import.meta.url).href;
   };
 
   return (

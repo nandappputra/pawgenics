@@ -11,6 +11,7 @@ const App = () => {
     },
     leftEye: {
       variant: "eye1",
+      color: "blue",
     },
     rightEye: {
       variant: "eye1",
