@@ -4,7 +4,11 @@ import DogPicture from "./components/DogPicture";
 
 const App = () => {
   const dogGenes = {
-    ear: {
+    leftEar: {
+      variant: "ear1",
+      color: "blue",
+    },
+    rightEar: {
       variant: "ear1",
     },
     head: {
