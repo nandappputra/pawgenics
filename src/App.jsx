@@ -1,8 +1,9 @@
 import React from "react";
-import Dog from "./components/Dog";
+import Dog from "./models/Dog.mjs";
+import DogPicture from "./components/DogPicture";
 
 const App = () => {
-  const dog = {
+  const dogGenes = {
     ear: {
       variant: "ear1",
     },
@@ -11,7 +12,7 @@ const App = () => {
     },
     leftEye: {
       variant: "eye1",
-      color: "blue",
+      color: "violet",
     },
     rightEye: {
       variant: "eye1",
@@ -27,10 +28,12 @@ const App = () => {
     },
   };
 
+  const dog = new Dog(dogGenes);
+
   return (
     <div>
       Pawgenics
-      <Dog dog={dog} />
+      <DogPicture dog={dog} />
     </div>
   );
 };
