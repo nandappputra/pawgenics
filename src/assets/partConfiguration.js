@@ -2,6 +2,9 @@ const partProperties = {
   ear1: {
     colorable: [0],
   },
+  ear2: {
+    colorable: [0],
+  },
   eye1: {
     colorable: [0],
   },
@@ -9,7 +12,7 @@ const partProperties = {
     colorable: [0],
   },
   mouth1: {
-    colorable: [0],
+    colorable: [],
   },
   muzzle1: {
     colorable: [0],

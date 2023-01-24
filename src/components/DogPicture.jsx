@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { fabric } from "fabric";
 import partProperties from "../assets/partConfiguration";
 
-const DogPicture = ({ dog }) => {
+const DogPicture = ({ dog, id }) => {
   const CANVAS_WITDH = 300;
   const CANVAS_HEIGHT = 300;
   const centerX = 150;
@@ -50,7 +50,7 @@ const DogPicture = ({ dog }) => {
       backgroundColor: "deepskyblue",
     };
 
-    canvas = new fabric.Canvas("main-canvas", options);
+    canvas = new fabric.Canvas(id, options);
     canvas.hoverCursor = "default";
     canvas.selection = false;
 
@@ -115,7 +115,7 @@ const DogPicture = ({ dog }) => {
       <canvas
         width="300"
         height="300"
-        id="main-canvas"
+        id={id}
         style={{ borderRadius: "1em", border: "3px solid black" }}
       />
     </div>

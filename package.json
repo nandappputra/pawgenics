@@ -10,6 +10,7 @@
     "lint": "eslint src/**"
   },
   "dependencies": {
+    "chroma-js": "^2.4.2",
     "fabric": "^5.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
