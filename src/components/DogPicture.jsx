@@ -106,6 +106,16 @@ const DogPicture = ({ dog, id }) => {
     return new URL(`../assets/${variant}.svg`, import.meta.url).href;
   };
 
+  const handleDownload = () => {
+    const dataURL = canvas.toDataURL("png");
+    const link = document.createElement("a");
+    link.download = "image.png";
+    link.href = dataURL;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div>
       <canvas
@@ -117,6 +127,7 @@ const DogPicture = ({ dog, id }) => {
           border: "3px solid black",
         }}
       />
+      <button onClick={handleDownload}>download</button>
     </div>
   );
 };
