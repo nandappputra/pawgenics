@@ -91,9 +91,7 @@ const App = () => {
 
   const dog1 = new Dog(dogGenes1);
   const dog2 = new Dog(dogGenes2);
-
   const dog3 = dog1.combine(dog2);
-  console.log(dog3);
 
   return (
     <div>

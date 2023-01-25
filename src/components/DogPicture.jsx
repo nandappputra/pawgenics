@@ -24,16 +24,6 @@ const DogPicture = ({ dog, id }) => {
     nose: { top: centerY + 20, left: centerX },
   };
 
-  const zIndex = {
-    leftEar: 0,
-    rightEar: 1,
-    head: 2,
-    muzzle: 3,
-    rightEye: 4,
-    leftEye: 5,
-    mouth: 6,
-    nose: 7,
-  };
   let canvasRendered = false;
 
   useEffect(() => {
@@ -43,7 +33,7 @@ const DogPicture = ({ dog, id }) => {
     }
   }, []);
 
-  const initCanvas = async () => {
+  const initCanvas = () => {
     const options = {
       width: CANVAS_WITDH,
       height: CANVAS_HEIGHT,
@@ -59,25 +49,31 @@ const DogPicture = ({ dog, id }) => {
     return canvas;
   };
 
-  const renderDog = () => {
+  const renderDog = async () => {
     for (const part in dog.gene) {
-      buildPart(part, dog.gene[part]);
+      await buildPart(part, dog.gene[part]);
     }
-
-    canvas.renderAll();
   };
 
   const buildPart = (part, partConfig) => {
     const partName = `${partConfig.variant}`;
-    fabric.loadSVGFromURL(generateVariantUrl(partName), async (results) => {
-      const groupSVG = fabric.util.groupSVGElements(results);
 
-      applyPartColor(partName, partConfig, groupSVG);
-      disableControlAndSelection(groupSVG);
-      applyPartPosition(part, groupSVG);
+    return new Promise((resolve) => {
+      fabric.loadSVGFromURL(
+        generateVariantUrl(partName),
+        (results, options) => {
+          const groupSVG = fabric.util.groupSVGElements(results, options);
 
-      canvas.add(groupSVG);
-      groupSVG.moveTo(zIndex[part]);
+          applyPartColor(partName, partConfig, groupSVG);
+          applyPartPosition(part, groupSVG);
+          disableControlAndSelection(groupSVG);
+
+          canvas.add(groupSVG);
+          canvas.renderAll();
+
+          resolve(groupSVG);
+        }
+      );
     });
   };
 
@@ -116,7 +112,10 @@ const DogPicture = ({ dog, id }) => {
         width="300"
         height="300"
         id={id}
-        style={{ borderRadius: "1em", border: "3px solid black" }}
+        style={{
+          borderRadius: "1em",
+          border: "3px solid black",
+        }}
       />
     </div>
   );
