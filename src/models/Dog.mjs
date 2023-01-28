@@ -1,8 +1,50 @@
 import chroma from "chroma-js";
 
+import partProperties from "../assets/partConfiguration";
+import { PARTS } from "../utils/constants.mjs";
+
 class Dog {
   constructor(gene) {
     this.gene = gene;
+  }
+
+  static buildDogFromHash(hash) {
+    const gene = {};
+
+    gene["leftEar"] = this.constructPartFromHash(PARTS.EAR, hash.slice(0, 4));
+    gene["rightEar"] = { ...gene["leftEar"] };
+    gene["head"] = this.constructPartFromHash(PARTS.HEAD, hash.slice(4, 8));
+    gene["leftEye"] = this.constructPartFromHash(PARTS.EYE, hash.slice(8, 12));
+    gene["rightEye"] = { ...gene["leftEye"] };
+    gene["muzzle"] = this.constructPartFromHash(
+      PARTS.MUZZLE,
+      hash.slice(12, 16)
+    );
+    gene["mouth"] = this.constructPartFromHash(PARTS.MOUTH, hash.slice(16, 20));
+    gene["nose"] = this.constructPartFromHash(PARTS.NOSE, hash.slice(20, 24));
+
+    return new Dog(gene);
+  }
+
+  static constructPartFromHash(part, hashUint8Array) {
+    return {
+      variant: this.pickVariant(part, hashUint8Array[0]),
+      color: this.pickColor(
+        hashUint8Array[1],
+        hashUint8Array[2],
+        hashUint8Array[3]
+      ),
+    };
+  }
+
+  static pickVariant(part, num) {
+    const partVariant = (num % partProperties.metadata[part].variations) + 1;
+
+    return `${part}${partVariant}`;
+  }
+
+  static pickColor(r, g, b) {
+    return `rgb(${r},${g},${b})`;
   }
 
   combine(dog) {

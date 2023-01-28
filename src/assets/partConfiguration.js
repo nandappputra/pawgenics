@@ -1,4 +1,24 @@
 const partProperties = {
+  metadata: {
+    ear: {
+      variations: 2,
+    },
+    eye: {
+      variations: 1,
+    },
+    head: {
+      variations: 1,
+    },
+    mouth: {
+      variations: 1,
+    },
+    muzzle: {
+      variations: 1,
+    },
+    nose: {
+      variations: 1,
+    },
+  },
   ear1: {
     colorable: [0],
   },
