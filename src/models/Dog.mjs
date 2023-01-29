@@ -1,14 +1,74 @@
 import chroma from "chroma-js";
+import nacl from "tweetnacl";
+import { fabric } from "fabric";
+import * as metaPNG from "meta-png";
 
 import partProperties from "../assets/partConfiguration";
 import { PARTS } from "../utils/constants.mjs";
 
 class Dog {
-  constructor(gene) {
+  constructor(gene, signedHash = null, publicKey = null) {
     this.gene = gene;
+    this.signedHash = signedHash;
+    this.publicKey = publicKey;
   }
 
-  static buildDogFromHash(hash) {
+  static async buildDog(name, uuid) {
+    const encoder = new TextEncoder();
+    const encodedText = encoder.encode(`${name}-${uuid}`);
+
+    const hash = nacl.hash(encodedText);
+    const keyPair = nacl.sign.keyPair();
+
+    const seed = new Uint8Array(hash.length + keyPair.publicKey.length);
+    seed.set(hash);
+    seed.set(keyPair.publicKey, hash.length);
+
+    const geneHash = nacl.hash(seed);
+    const signedHash = nacl.sign(hash, keyPair.secretKey);
+
+    const gene = this.buildDogGeneFromHash(geneHash);
+    let privateKeyDataURI = "";
+    try {
+      privateKeyDataURI = await this.generatePrivateKeyDataURI(
+        keyPair.secretKey
+      );
+    } catch (error) {
+      console.log("error:", error);
+    }
+
+    const dog = new Dog(gene, signedHash, keyPair.publicKey);
+
+    return [dog, privateKeyDataURI];
+  }
+
+  static async generatePrivateKeyDataURI(secretKey) {
+    const keyUrl = new URL("../assets/key.svg", import.meta.url).href;
+    const keyImage = await this.constructKeyDataUrl(keyUrl);
+
+    return metaPNG.default.addMetadataFromBase64DataURI(
+      keyImage,
+      "pawgenics_secretKey",
+      secretKey
+    );
+  }
+
+  static async constructKeyDataUrl(url) {
+    const canvas = new fabric.Canvas(null, { height: 150, width: 150 });
+
+    return new Promise((resolve) => {
+      fabric.loadSVGFromURL(url, (results, options) => {
+        const key = fabric.util.groupSVGElements(results, options);
+
+        canvas.add(key);
+        canvas.renderAll();
+
+        resolve(canvas.toDataURL("png"));
+      });
+    });
+  }
+
+  static buildDogGeneFromHash(hash) {
     const gene = {};
 
     gene["leftEar"] = this.constructPartFromHash(PARTS.EAR, hash.slice(0, 4));
@@ -23,7 +83,7 @@ class Dog {
     gene["mouth"] = this.constructPartFromHash(PARTS.MOUTH, hash.slice(16, 20));
     gene["nose"] = this.constructPartFromHash(PARTS.NOSE, hash.slice(20, 24));
 
-    return new Dog(gene);
+    return gene;
   }
 
   static constructPartFromHash(part, hashUint8Array) {
