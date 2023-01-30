@@ -20,11 +20,8 @@ class Dog {
     const hash = nacl.hash(encodedText);
     const keyPair = nacl.sign.keyPair();
 
-    const seed = new Uint8Array(hash.length + keyPair.publicKey.length);
-    seed.set(hash);
-    seed.set(keyPair.publicKey, hash.length);
+    const geneHash = this.combineHashAndPublicKey(hash, keyPair.publicKey);
 
-    const geneHash = nacl.hash(seed);
     const signedHash = nacl.sign(hash, keyPair.secretKey);
 
     const gene = this.buildDogGeneFromHash(geneHash);
@@ -35,6 +32,13 @@ class Dog {
     const dog = new Dog(gene, signedHash, keyPair.publicKey);
 
     return [dog, privateKeyDataURI];
+  }
+
+  static combineHashAndPublicKey(hash, publicKey) {
+    const seed = new Uint8Array(hash.length + publicKey.length);
+    seed.set(hash);
+    seed.set(publicKey, hash.length);
+    return nacl.hash(seed);
   }
 
   static async generatePrivateKeyDataURI(secretKey) {
