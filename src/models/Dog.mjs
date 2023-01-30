@@ -28,14 +28,9 @@ class Dog {
     const signedHash = nacl.sign(hash, keyPair.secretKey);
 
     const gene = this.buildDogGeneFromHash(geneHash);
-    let privateKeyDataURI = "";
-    try {
-      privateKeyDataURI = await this.generatePrivateKeyDataURI(
-        keyPair.secretKey
-      );
-    } catch (error) {
-      console.log("error:", error);
-    }
+    const privateKeyDataURI = await this.generatePrivateKeyDataURI(
+      keyPair.secretKey
+    );
 
     const dog = new Dog(gene, signedHash, keyPair.publicKey);
 
