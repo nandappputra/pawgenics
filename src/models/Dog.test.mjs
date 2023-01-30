@@ -5,7 +5,7 @@ import { convertPNGDataURLToUint8Array } from "../utils/ImageUtils.mjs";
 
 describe("Dog", () => {
   describe("buildDog", () => {
-    test("should return a Dog with gene, signedHash, and public key", async () => {
+    test("should return a Dog with gene, signed hash, and public key", async () => {
       const name = "testDog";
       const uuid = "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d";
 
