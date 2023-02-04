@@ -1,14 +1,15 @@
 import { fabric } from "fabric";
-import Dog from "../models/Dog.mjs";
 import * as metaPNG from "meta-png";
 import { v4 as uuidv4, parse as uuidParse } from "uuid";
+import nacl from "tweetnacl";
 
+import Dog from "../models/Dog.mjs";
 import {
   convertMetadataStringToUint8Array,
   convertPNGDataURLToUint8Array,
+  getMetadataFromUint8Array,
 } from "../utils/ImageUtils.mjs";
 import ImageService from "./ImageService.mjs";
-import nacl from "tweetnacl";
 
 describe("ImageService", () => {
   describe("generateDogPNGWithMetadata", () => {
@@ -21,13 +22,13 @@ describe("ImageService", () => {
       const pngUint8Array = convertPNGDataURLToUint8Array(response);
 
       expect(
-        metaPNG.default.getMetadata(pngUint8Array, "pawgenics_gene")
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_gene")
       ).toBeDefined();
       expect(
-        metaPNG.default.getMetadata(pngUint8Array, "pawgenics_signedHash")
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_signedHash")
       ).toBeDefined();
       expect(
-        metaPNG.default.getMetadata(pngUint8Array, "pawgenics_publicKey")
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_publicKey")
       ).toBeDefined();
     });
   });
@@ -139,10 +140,7 @@ describe("ImageService", () => {
       const pngUint8Array = convertPNGDataURLToUint8Array(response);
 
       expect(
-        metaPNG.default.getMetadata(
-          pngUint8Array,
-          "pawgenics_signedApprovalHash"
-        )
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_signedApprovalHash")
       ).toBeDefined();
     });
   });
@@ -161,7 +159,7 @@ describe("ImageService", () => {
       const pngUint8Array = convertPNGDataURLToUint8Array(response);
 
       expect(
-        metaPNG.default.getMetadata(pngUint8Array, "pawgenics_signedMarriageId")
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_signedMarriageId")
       ).toBeDefined();
     });
   });
@@ -248,6 +246,21 @@ describe("ImageService", () => {
       );
 
       expect(actualDog).toStrictEqual(expectedDog);
+    });
+  });
+
+  describe("generatePrivateKeyDataPNG", () => {
+    test("should return a data url with private key in its metadata", async () => {
+      const keyPair = nacl.sign.keyPair();
+
+      const response = await ImageService.generatePrivateKeyDataPNG(
+        keyPair.secretKey
+      );
+      const pngUint8Array = convertPNGDataURLToUint8Array(response);
+
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_secretKey")
+      ).toBeDefined();
     });
   });
 

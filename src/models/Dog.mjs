@@ -1,9 +1,8 @@
 import chroma from "chroma-js";
 import nacl from "tweetnacl";
-import { fabric } from "fabric";
-import * as metaPNG from "meta-png";
 
 import GeneService from "../services/GeneService.mjs";
+import ImageService from "../services/ImageService.mjs";
 
 class Dog {
   constructor(
@@ -40,7 +39,7 @@ class Dog {
     const signedHash = nacl.sign(hash, keyPair.secretKey);
 
     const gene = GeneService.buildDogGeneFromHash(geneHash);
-    const privateKeyDataURI = await this.generatePrivateKeyDataURI(
+    const privateKeyDataURI = await ImageService.generatePrivateKeyDataPNG(
       keyPair.secretKey
     );
 
@@ -54,32 +53,6 @@ class Dog {
     seed.set(hash);
     seed.set(publicKey, hash.length);
     return nacl.hash(seed);
-  }
-
-  static async generatePrivateKeyDataURI(secretKey) {
-    const keyUrl = new URL("../assets/key.svg", import.meta.url).href;
-    const keyImage = await this.constructKeyDataUrl(keyUrl);
-
-    return metaPNG.default.addMetadataFromBase64DataURI(
-      keyImage,
-      "pawgenics_secretKey",
-      secretKey
-    );
-  }
-
-  static async constructKeyDataUrl(url) {
-    const canvas = new fabric.Canvas(null, { height: 150, width: 150 });
-
-    return new Promise((resolve) => {
-      fabric.loadSVGFromURL(url, (results, options) => {
-        const key = fabric.util.groupSVGElements(results, options);
-
-        canvas.add(key);
-        canvas.renderAll();
-
-        resolve(canvas.toDataURL("png"));
-      });
-    });
   }
 
   combine(dog) {

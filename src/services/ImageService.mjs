@@ -1,5 +1,6 @@
 import * as metaPNG from "meta-png";
 import nacl from "tweetnacl";
+import { fabric } from "fabric";
 
 import {
   convertPNGDataURLToUint8Array,
@@ -196,6 +197,32 @@ const generateApprovalPNG = (dogApprover, canvas, secretKey, marriageId) => {
   return dataURL;
 };
 
+const generatePrivateKeyDataPNG = async (secretKey) => {
+  const keyUrl = new URL("../assets/key.svg", import.meta.url).href;
+  const keyImage = await constructKeyDataUrl(keyUrl);
+
+  return metaPNG.default.addMetadataFromBase64DataURI(
+    keyImage,
+    "pawgenics_secretKey",
+    secretKey
+  );
+};
+
+const constructKeyDataUrl = (url) => {
+  const canvas = new fabric.Canvas(null, { height: 150, width: 150 });
+
+  return new Promise((resolve) => {
+    fabric.loadSVGFromURL(url, (results, options) => {
+      const key = fabric.util.groupSVGElements(results, options);
+
+      canvas.add(key);
+      canvas.renderAll();
+
+      resolve(canvas.toDataURL("png"));
+    });
+  });
+};
+
 const appendHash = (hash, publicKey, marriageId) => {
   const seed = new Uint8Array(
     hash.length + publicKey.length + marriageId.length
@@ -217,6 +244,7 @@ const ImageService = {
   isValidDogPNG,
   generateProposalPNG,
   generateApprovalPNG,
+  generatePrivateKeyDataPNG,
 };
 
 export default ImageService;
