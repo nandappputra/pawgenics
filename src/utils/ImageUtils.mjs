@@ -1,4 +1,5 @@
 import base64 from "binary-base64";
+import * as metaPNG from "meta-png";
 
 export const convertPNGDataURLToUint8Array = (dataURL) => {
   const header = "data:image/png;base64,";
@@ -11,4 +12,8 @@ export const convertMetadataStringToUint8Array = (metadata) => {
   const array = metadata.split(",").map((element) => parseInt(element));
 
   return new Uint8Array(array);
+};
+
+export const getMetadataFromUint8Array = (pngUint8Array, key) => {
+  return metaPNG.default.getMetadata(pngUint8Array, key);
 };

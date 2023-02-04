@@ -1,6 +1,9 @@
+import * as metaPNG from "meta-png";
+
 import {
   convertPNGDataURLToUint8Array,
   convertMetadataStringToUint8Array,
+  getMetadataFromUint8Array,
 } from "./ImageUtils.mjs";
 
 describe("ImageUtils", () => {
@@ -25,4 +28,24 @@ describe("ImageUtils", () => {
       expect(actualResponse).toEqual(expectedResponse);
     });
   });
+
+  describe("getMetadataFromUint8Array", () => {
+    test("should return metadata from Uint8Array png", async () => {
+      let dataURL = generateDataURLWithoutMetadata();
+      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+        dataURL,
+        "pawgenics_gene",
+        "hello"
+      );
+      const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
+
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_gene")
+      ).toEqual("hello");
+    });
+  });
+
+  const generateDataURLWithoutMetadata = () => {
+    return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAAAxUlEQVR4nO3BMQEAAADCoPVPbQhfoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOA1v9QAATX68/0AAAAASUVORK5CYII=";
+  };
 });
