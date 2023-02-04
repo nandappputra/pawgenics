@@ -62,6 +62,19 @@ class ImageService {
     }
   }
 
+  static generateProposalPNG(canvas, secretKey, uuid) {
+    let dataURL = canvas.toDataURL("png");
+    const signedMarriageId = nacl.sign(uuid, secretKey);
+
+    dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL,
+      "pawgenics_signedMarriageId",
+      signedMarriageId
+    );
+
+    return dataURL;
+  }
+
   static convertMetadataToUInt8Array(metadata) {
     const array = metadata.split(",").map((element) => parseInt(element));
     return new Uint8Array(array);

@@ -1,9 +1,11 @@
 import { fabric } from "fabric";
 import Dog from "../models/Dog.mjs";
 import * as metaPNG from "meta-png";
+import { v4 as uuidv4, parse as uuidParse } from "uuid";
 
 import { convertPNGDataURLToUint8Array } from "../utils/ImageUtils.mjs";
 import ImageService from "./ImageService.mjs";
+import nacl from "tweetnacl";
 
 describe("ImageService", () => {
   describe("generateDogPNGWithMetadata", () => {
@@ -109,6 +111,26 @@ describe("ImageService", () => {
       const response = ImageService.isValidDogPNG(dataURL);
 
       expect(response).toBe(true);
+    });
+  });
+
+  describe("generateProposalPNG", () => {
+    test("should return a PNG with hash marriage ID", () => {
+      const canvas = new fabric.Canvas();
+      const randomUuid = uuidParse(uuidv4());
+      console.log(randomUuid);
+      const keyPair = nacl.sign.keyPair();
+
+      const response = ImageService.generateProposalPNG(
+        canvas,
+        keyPair.secretKey,
+        randomUuid
+      );
+      const pngUint8Array = convertPNGDataURLToUint8Array(response);
+
+      expect(
+        metaPNG.default.getMetadata(pngUint8Array, "pawgenics_signedMarriageId")
+      ).toBeDefined();
     });
   });
 
