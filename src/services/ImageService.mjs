@@ -6,7 +6,7 @@ import {
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
   convertMetadataStringToUint8Array,
-} from "../utils/ImageUtils.mjs";
+} from "../utils/ImageUtil.mjs";
 import Dog from "../models/Dog.mjs";
 import GeneService from "./GeneService.mjs";
 

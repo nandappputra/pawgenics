@@ -1,7 +1,7 @@
 import {
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
-} from "../utils/ImageUtils.mjs";
+} from "../utils/ImageUtil.mjs";
 import { METADATA } from "../utils/constants.mjs";
 
 const validateMetadataPresence = (dataURL) => {
@@ -11,6 +11,7 @@ const validateMetadataPresence = (dataURL) => {
     if (getMetadataFromUint8Array(pngUint8Array, key) === undefined) {
       throw `missing ${key}`;
     }
+
     return true;
   });
 };

@@ -8,7 +8,7 @@ import {
   convertMetadataStringToUint8Array,
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
-} from "../utils/ImageUtils.mjs";
+} from "../utils/ImageUtil.mjs";
 import ImageService from "./ImageService.mjs";
 
 describe("ImageService", () => {
