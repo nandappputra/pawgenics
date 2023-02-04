@@ -9,6 +9,7 @@ import {
 } from "../utils/ImageUtil.mjs";
 import Dog from "../models/Dog.mjs";
 import GeneService from "./GeneService.mjs";
+import { appendHash } from "../utils/GeneUtil.mjs";
 
 const buildDogFromDataURL = (dataURL) => {
   const pngArray = convertPNGDataURLToUint8Array(dataURL);
@@ -147,6 +148,7 @@ const isValidDogPNG = (dataURL) => {
     if (publicKeyMeta === undefined) {
       return false;
     }
+
     const publicKey = convertMetadataToUInt8Array(publicKeyMeta);
 
     const signedHashMeta = metaPNG.default.getMetadata(
@@ -159,7 +161,7 @@ const isValidDogPNG = (dataURL) => {
     const signedHash = convertMetadataToUInt8Array(signedHashMeta);
 
     const hash = nacl.sign.open(signedHash, publicKey);
-    const reproducedSeed = Dog.combineHashAndPublicKey(hash, publicKey);
+    const reproducedSeed = nacl.hash(appendHash([hash, publicKey]));
     const reproducedGene = GeneService.buildDogGeneFromHash(reproducedSeed);
 
     return geneMeta === JSON.stringify(reproducedGene);
@@ -221,16 +223,6 @@ const constructKeyDataUrl = (url) => {
       resolve(canvas.toDataURL("png"));
     });
   });
-};
-
-const appendHash = (hash, publicKey, marriageId) => {
-  const seed = new Uint8Array(
-    hash.length + publicKey.length + marriageId.length
-  );
-  seed.set(hash);
-  seed.set(publicKey, hash.length);
-  seed.set(marriageId, hash.length + publicKey.length);
-  return nacl.hash(seed);
 };
 
 const convertMetadataToUInt8Array = (metadata) => {

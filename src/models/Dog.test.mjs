@@ -1,7 +1,6 @@
-import nacl from "tweetnacl";
 import Dog from "./Dog.mjs";
 import * as metaPNG from "meta-png";
-import { convertPNGDataURLToUint8Array } from "../utils/ImageUtils.mjs";
+import { convertPNGDataURLToUint8Array } from "../utils/ImageUtil.mjs";
 
 describe("Dog", () => {
   describe("buildDog", () => {

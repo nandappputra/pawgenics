@@ -3,6 +3,7 @@ import nacl from "tweetnacl";
 
 import GeneService from "../services/GeneService.mjs";
 import ImageService from "../services/ImageService.mjs";
+import { appendHash } from "../utils/GeneUtil.mjs";
 
 class Dog {
   constructor(
@@ -34,7 +35,7 @@ class Dog {
     const hash = nacl.hash(encodedText);
     const keyPair = nacl.sign.keyPair();
 
-    const geneHash = this.combineHashAndPublicKey(hash, keyPair.publicKey);
+    const geneHash = nacl.hash(appendHash([hash, keyPair.publicKey]));
 
     const signedHash = nacl.sign(hash, keyPair.secretKey);
 
@@ -46,13 +47,6 @@ class Dog {
     const dog = new Dog(gene, signedHash, keyPair.publicKey);
 
     return [dog, privateKeyDataURI];
-  }
-
-  static combineHashAndPublicKey(hash, publicKey) {
-    const seed = new Uint8Array(hash.length + publicKey.length);
-    seed.set(hash);
-    seed.set(publicKey, hash.length);
-    return nacl.hash(seed);
   }
 
   combine(dog) {
