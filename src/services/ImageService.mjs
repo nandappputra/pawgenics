@@ -7,6 +7,7 @@ import {
   convertMetadataStringToUint8Array,
 } from "../utils/ImageUtils.mjs";
 import Dog from "../models/Dog.mjs";
+import GeneService from "./GeneService.mjs";
 
 const buildDogFromDataURL = (dataURL) => {
   const pngArray = convertPNGDataURLToUint8Array(dataURL);
@@ -158,7 +159,7 @@ const isValidDogPNG = (dataURL) => {
 
     const hash = nacl.sign.open(signedHash, publicKey);
     const reproducedSeed = Dog.combineHashAndPublicKey(hash, publicKey);
-    const reproducedGene = Dog.buildDogGeneFromHash(reproducedSeed);
+    const reproducedGene = GeneService.buildDogGeneFromHash(reproducedSeed);
 
     return geneMeta === JSON.stringify(reproducedGene);
   } catch (error) {

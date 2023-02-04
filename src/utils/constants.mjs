@@ -1,10 +1,36 @@
 export const PARTS = {
-  EAR: "ear",
-  MOUTH: "mouth",
-  MUZZLE: "muzzle",
-  NOSE: "nose",
-  EYE: "eye",
-  HEAD: "head",
+  LEFT_EAR: {
+    NAME: "leftEar",
+    CATEGORY: "ear",
+  },
+  RIGHT_EAR: {
+    NAME: "rightEar",
+    CATEGORY: "ear",
+  },
+  HEAD: {
+    NAME: "head",
+    CATEGORY: "head",
+  },
+  MUZZLE: {
+    NAME: "muzzle",
+    CATEGORY: "muzzle",
+  },
+  MOUTH: {
+    NAME: "mouth",
+    CATEGORY: "mouth",
+  },
+  NOSE: {
+    NAME: "nose",
+    CATEGORY: "nose",
+  },
+  LEFT_EYE: {
+    NAME: "leftEye",
+    CATEGORY: "eye",
+  },
+  RIGHT_EYE: {
+    NAME: "rightEye",
+    CATEGORY: "eye",
+  },
 };
 
 export const METADATA = {

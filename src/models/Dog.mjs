@@ -3,8 +3,7 @@ import nacl from "tweetnacl";
 import { fabric } from "fabric";
 import * as metaPNG from "meta-png";
 
-import partProperties from "../assets/partConfiguration";
-import { PARTS } from "../utils/constants.mjs";
+import GeneService from "../services/GeneService.mjs";
 
 class Dog {
   constructor(
@@ -40,7 +39,7 @@ class Dog {
 
     const signedHash = nacl.sign(hash, keyPair.secretKey);
 
-    const gene = this.buildDogGeneFromHash(geneHash);
+    const gene = GeneService.buildDogGeneFromHash(geneHash);
     const privateKeyDataURI = await this.generatePrivateKeyDataURI(
       keyPair.secretKey
     );
@@ -81,45 +80,6 @@ class Dog {
         resolve(canvas.toDataURL("png"));
       });
     });
-  }
-
-  static buildDogGeneFromHash(hash) {
-    const gene = {};
-
-    gene["leftEar"] = this.constructPartFromHash(PARTS.EAR, hash.slice(0, 4));
-    gene["rightEar"] = { ...gene["leftEar"] };
-    gene["head"] = this.constructPartFromHash(PARTS.HEAD, hash.slice(4, 8));
-    gene["leftEye"] = this.constructPartFromHash(PARTS.EYE, hash.slice(8, 12));
-    gene["rightEye"] = { ...gene["leftEye"] };
-    gene["muzzle"] = this.constructPartFromHash(
-      PARTS.MUZZLE,
-      hash.slice(12, 16)
-    );
-    gene["mouth"] = this.constructPartFromHash(PARTS.MOUTH, hash.slice(16, 20));
-    gene["nose"] = this.constructPartFromHash(PARTS.NOSE, hash.slice(20, 24));
-
-    return gene;
-  }
-
-  static constructPartFromHash(part, hashUint8Array) {
-    return {
-      variant: this.pickVariant(part, hashUint8Array[0]),
-      color: this.pickColor(
-        hashUint8Array[1],
-        hashUint8Array[2],
-        hashUint8Array[3]
-      ),
-    };
-  }
-
-  static pickVariant(part, num) {
-    const partVariant = (num % partProperties.metadata[part].variations) + 1;
-
-    return `${part}${partVariant}`;
-  }
-
-  static pickColor(r, g, b) {
-    return `rgb(${r},${g},${b})`;
   }
 
   combine(dog) {
