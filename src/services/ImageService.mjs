@@ -62,9 +62,9 @@ class ImageService {
     }
   }
 
-  static generateProposalPNG(canvas, secretKey, uuid) {
+  static generateProposalPNG(canvas, secretKey, marriageId) {
     let dataURL = canvas.toDataURL("png");
-    const signedMarriageId = nacl.sign(uuid, secretKey);
+    const signedMarriageId = nacl.sign(marriageId, secretKey);
 
     dataURL = metaPNG.default.addMetadataFromBase64DataURI(
       dataURL,
@@ -73,6 +73,36 @@ class ImageService {
     );
 
     return dataURL;
+  }
+
+  static generateApprovalPNG(dogApprover, canvas, secretKey, marriageId) {
+    let dataURL = canvas.toDataURL("png");
+
+    const hash = nacl.sign.open(dogApprover.signedHash, dogApprover.publicKey);
+    const appendedHash = this.appendHash(
+      hash,
+      dogApprover.publicKey,
+      marriageId
+    );
+    const signedApprovalHash = nacl.sign(appendedHash, secretKey);
+
+    dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL,
+      "pawgenics_signedApprovalHash",
+      signedApprovalHash
+    );
+
+    return dataURL;
+  }
+
+  static appendHash(hash, publicKey, marriageId) {
+    const seed = new Uint8Array(
+      hash.length + publicKey.length + marriageId.length
+    );
+    seed.set(hash);
+    seed.set(publicKey, hash.length);
+    seed.set(marriageId, hash.length + publicKey.length);
+    return nacl.hash(seed);
   }
 
   static convertMetadataToUInt8Array(metadata) {

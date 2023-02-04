@@ -3,7 +3,10 @@ import Dog from "../models/Dog.mjs";
 import * as metaPNG from "meta-png";
 import { v4 as uuidv4, parse as uuidParse } from "uuid";
 
-import { convertPNGDataURLToUint8Array } from "../utils/ImageUtils.mjs";
+import {
+  convertMetadataStringToUint8Array,
+  convertPNGDataURLToUint8Array,
+} from "../utils/ImageUtils.mjs";
 import ImageService from "./ImageService.mjs";
 import nacl from "tweetnacl";
 
@@ -115,10 +118,39 @@ describe("ImageService", () => {
   });
 
   describe("generateProposalPNG", () => {
-    test("should return a PNG with hash marriage ID", () => {
+    test("should return a PNG with hashed marriage ID", async () => {
+      const [dog, key] = await Dog.buildDog("test", "random");
+
+      const keyArray = convertPNGDataURLToUint8Array(key);
+      const secretKeyString = metaPNG.default.getMetadata(
+        keyArray,
+        "pawgenics_secretKey"
+      );
+      const secretKey = convertMetadataStringToUint8Array(secretKeyString);
       const canvas = new fabric.Canvas();
       const randomUuid = uuidParse(uuidv4());
-      console.log(randomUuid);
+
+      const response = ImageService.generateApprovalPNG(
+        dog,
+        canvas,
+        secretKey,
+        randomUuid
+      );
+      const pngUint8Array = convertPNGDataURLToUint8Array(response);
+
+      expect(
+        metaPNG.default.getMetadata(
+          pngUint8Array,
+          "pawgenics_signedApprovalHash"
+        )
+      ).toBeDefined();
+    });
+  });
+
+  describe("generateApprovalPNG", () => {
+    test("should return a PNG with hashed approval", () => {
+      const canvas = new fabric.Canvas();
+      const randomUuid = uuidParse(uuidv4());
       const keyPair = nacl.sign.keyPair();
 
       const response = ImageService.generateProposalPNG(
