@@ -51,4 +51,40 @@ describe("GeneService", () => {
       );
     });
   });
+
+  describe("generateMarriageHashFromParents", () => {
+    test("should return deterministic hash based on marriage id and parent information", () => {
+      const encoder = new TextEncoder();
+
+      const date = new Date("05 Feb 2023 00:00:00 GMT");
+      const marriageId = encoder.encode(date.valueOf);
+      const publicKey1 = new Uint8Array([
+        26, 129, 98, 68, 16, 203, 8, 246, 79, 22, 179, 15, 50, 217, 227, 115,
+        166, 5, 100, 135, 201, 75, 163, 220, 151, 255, 213, 92, 68, 242, 16,
+        168,
+      ]);
+      const publicKey2 = new Uint8Array([
+        [
+          121, 56, 13, 2, 72, 13, 34, 100, 245, 205, 120, 203, 241, 9, 108, 120,
+          28, 201, 187, 85, 254, 176, 137, 38, 169, 120, 47, 134, 65, 171, 20,
+          151,
+        ],
+      ]);
+
+      const actualResult = GeneService.generateMarriageHashFromParents(
+        marriageId,
+        publicKey1,
+        publicKey2
+      );
+      const expectedResult = new Uint8Array([
+        167, 129, 242, 88, 68, 110, 73, 18, 19, 175, 65, 164, 22, 39, 237, 236,
+        225, 82, 88, 129, 214, 171, 116, 132, 39, 28, 161, 206, 27, 80, 182, 28,
+        249, 11, 247, 113, 200, 28, 188, 40, 134, 195, 186, 137, 255, 0, 97, 19,
+        43, 167, 253, 182, 110, 177, 136, 159, 54, 246, 115, 174, 73, 10, 233,
+        218,
+      ]);
+
+      expect(actualResult).toStrictEqual(expectedResult);
+    });
+  });
 });

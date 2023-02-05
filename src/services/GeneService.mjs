@@ -47,6 +47,16 @@ const generateSignedMarriageHashFromApproval = (
   return nacl.sign(marriageHash, secretKey);
 };
 
+const generateMarriageHashFromParents = (
+  marriageId,
+  parent1PublicKey,
+  parent2PublicKey
+) => {
+  const parent1Hashed = nacl.hash(appendHash(marriageId, parent1PublicKey));
+
+  return nacl.hash(appendHash([parent1Hashed, parent2PublicKey]));
+};
+
 const constructPartFromHash = (part, hashUint8Array) => {
   return {
     variant: pickVariant(part, hashUint8Array[0]),
@@ -67,6 +77,7 @@ const pickColor = (r, g, b) => {
 const GeneService = {
   buildDogGeneFromHash,
   generateSignedMarriageHashFromApproval,
+  generateMarriageHashFromParents,
 };
 
 export default GeneService;
