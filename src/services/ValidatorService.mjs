@@ -24,7 +24,15 @@ const validateDogAuthenticity = (dog) => {
     dog.parent2PublicKey
   );
   if (parent1Hash === null || parent2Hash == null) {
-    throw `invalid parent hash`;
+    throw "invalid parent hash";
+  }
+
+  const marriageHash = nacl.sign.open(
+    dog.parentMarriageHash,
+    dog.parent2PublicKey
+  );
+  if (marriageHash === null) {
+    throw "invalid marriage id";
   }
 };
 
