@@ -3,6 +3,7 @@ import * as metaPNG from "meta-png";
 import ValidatorService from "./ValidatorService.mjs";
 import Dog from "../models/Dog.mjs";
 import nacl from "tweetnacl";
+import { appendHash } from "../utils/GeneUtil.mjs";
 
 describe("ValidatorService", () => {
   const BLANK = null;
@@ -151,6 +152,39 @@ describe("ValidatorService", () => {
       expect(() => {
         ValidatorService.validateDogAuthenticity(dog);
       }).toThrow("invalid marriage id");
+    });
+
+    test("should throw an error when the dog hash cannot be opened with dog's public key", async () => {
+      const keyPair1 = nacl.sign.keyPair();
+      const keyPair2 = nacl.sign.keyPair();
+
+      const textEncoder = new TextEncoder();
+
+      const message = textEncoder.encode("test dna");
+      const mockParent1Hash = nacl.sign(message, keyPair1.secretKey);
+      const mockParent2Hash = nacl.sign(message, keyPair2.secretKey);
+      const mockMarriageHash = nacl.sign(message, keyPair2.secretKey);
+
+      const faultyHash = appendHash([
+        nacl.sign(message, keyPair1.secretKey),
+        new Uint8Array([1, 3]),
+      ]);
+
+      const dog = new Dog(
+        BLANK,
+        faultyHash,
+        keyPair1.publicKey,
+        BLANK,
+        BLANK,
+        keyPair2.publicKey,
+        mockParent1Hash,
+        mockParent2Hash,
+        mockMarriageHash
+      );
+
+      expect(() => {
+        ValidatorService.validateDogAuthenticity(dog);
+      }).toThrow("invalid hash");
     });
   });
 

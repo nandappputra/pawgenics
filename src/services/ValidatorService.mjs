@@ -4,6 +4,7 @@ import {
 } from "../utils/ImageUtil.mjs";
 import { METADATA } from "../utils/constants.mjs";
 import nacl from "tweetnacl";
+import GeneService from "./GeneService.mjs";
 
 const validateMetadataPresence = (dataURL) => {
   const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
@@ -33,6 +34,11 @@ const validateDogAuthenticity = (dog) => {
   );
   if (marriageHash === null) {
     throw "invalid marriage id";
+  }
+
+  const dogHash = nacl.sign.open(dog.signedHash, dog.publicKey);
+  if (dogHash === null) {
+    throw "invalid hash";
   }
 };
 
