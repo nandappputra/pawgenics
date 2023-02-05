@@ -25,7 +25,10 @@ npm run lint
 ```
 
 To run the tests, use:
-TBD
+
+```bash
+npm run test
+```
 
 ## How to Build
 
@@ -45,6 +48,6 @@ npm run dev
 
 or run based on the built application using:
 
-```
+```bash
 npm run preview
 ```
