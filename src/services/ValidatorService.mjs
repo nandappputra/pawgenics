@@ -19,7 +19,10 @@ const validateMetadataPresence = (dataURL) => {
 
 const validateDogAuthenticity = (dog) => {
   const parent1Hash = nacl.sign.open(dog.parent1SignedHash, dog.publicKey);
-  const parent2Hash = nacl.sign.open(dog.parent2SignedHash, dog.publicKey);
+  const parent2Hash = nacl.sign.open(
+    dog.parent2SignedHash,
+    dog.parent2PublicKey
+  );
   if (parent1Hash === null || parent2Hash == null) {
     throw `invalid parent hash`;
   }
