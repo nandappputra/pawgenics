@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import * as metaPNG from "meta-png";
 import { v4 as uuidv4, parse as uuidParse } from "uuid";
 import nacl from "tweetnacl";
 
@@ -8,6 +7,7 @@ import {
   convertMetadataStringToUint8Array,
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
+  addMetadataFromBase64DataURL,
 } from "../utils/ImageUtil.mjs";
 import ImageService from "./ImageService.mjs";
 
@@ -46,7 +46,7 @@ describe("ImageService", () => {
       const dog = dogWithKey[0];
 
       let dataURL = generateDataURLWithoutMetadata();
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify(dog.gene)
@@ -62,12 +62,12 @@ describe("ImageService", () => {
       const dog = dogWithKey[0];
 
       let dataURL = generateDataURLWithoutMetadata();
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify(dog.gene)
       );
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_publicKey",
         dog.publicKey
@@ -80,7 +80,7 @@ describe("ImageService", () => {
 
     test("should return false when there is an exception during parsing", async () => {
       let dataURL = generateDataURLWithoutMetadata();
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify("{invalid")
@@ -96,17 +96,17 @@ describe("ImageService", () => {
       const dog = dogWithKey[0];
 
       let dataURL = generateDataURLWithoutMetadata();
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify(dog.gene)
       );
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_publicKey",
         dog.publicKey
       );
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_signedHash",
         dog.signedHash
@@ -123,7 +123,7 @@ describe("ImageService", () => {
       const [dog, key] = await Dog.buildDog("test", "random");
 
       const keyArray = convertPNGDataURLToUint8Array(key);
-      const secretKeyString = metaPNG.default.getMetadata(
+      const secretKeyString = getMetadataFromUint8Array(
         keyArray,
         "pawgenics_secretKey"
       );
@@ -178,55 +178,55 @@ describe("ImageService", () => {
       const parent2SignedHash = new Uint8Array([10, 11]);
       const parentMarriageHash = new Uint8Array([12, 13]);
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify(gene)
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_signedHash",
         signedHash
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_publicKey",
         publicKey
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent1Gene",
         JSON.stringify(parent1Gene)
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent2Gene",
         JSON.stringify(parent2Gene)
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent2PublicKey",
         parent2PublicKey
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent1SignedHash",
         parent1SignedHash
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent2SignedHash",
         parent2SignedHash
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parentMarriageHash",
         parentMarriageHash

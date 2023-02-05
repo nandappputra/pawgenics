@@ -1,6 +1,8 @@
 import Dog from "./Dog.mjs";
-import * as metaPNG from "meta-png";
-import { convertPNGDataURLToUint8Array } from "../utils/ImageUtil.mjs";
+import {
+  convertPNGDataURLToUint8Array,
+  getMetadataFromUint8Array,
+} from "../utils/ImageUtil.mjs";
 
 describe("Dog", () => {
   describe("buildDog", () => {
@@ -22,11 +24,10 @@ describe("Dog", () => {
       const uuid = "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d";
 
       const response = await Dog.buildDog(name, uuid);
-
       const privateKeyDataURI = response[1];
 
       expect(
-        metaPNG.default.getMetadata(
+        getMetadataFromUint8Array(
           convertPNGDataURLToUint8Array(privateKeyDataURI),
           "pawgenics_secretKey"
         )

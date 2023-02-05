@@ -1,9 +1,9 @@
-import * as metaPNG from "meta-png";
+import nacl from "tweetnacl";
 
 import ValidatorService from "./ValidatorService.mjs";
 import Dog from "../models/Dog.mjs";
-import nacl from "tweetnacl";
 import { appendHash } from "../utils/GeneUtil.mjs";
+import { addMetadataFromBase64DataURL } from "../utils/ImageUtil.mjs";
 
 describe("ValidatorService", () => {
   const BLANK = null;
@@ -22,55 +22,55 @@ describe("ValidatorService", () => {
       const parent2SignedHash = new Uint8Array([10, 11]);
       const parentMarriageHash = new Uint8Array([12, 13]);
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify(gene)
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_signedHash",
         signedHash
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_publicKey",
         publicKey
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent1Gene",
         JSON.stringify(parent1Gene)
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent2Gene",
         JSON.stringify(parent2Gene)
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent2PublicKey",
         parent2PublicKey
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent1SignedHash",
         parent1SignedHash
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parent2SignedHash",
         parent2SignedHash
       );
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_parentMarriageHash",
         parentMarriageHash
@@ -84,7 +84,7 @@ describe("ValidatorService", () => {
 
       const gene = { test: "hi" };
 
-      dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         JSON.stringify(gene)

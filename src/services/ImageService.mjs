@@ -1,4 +1,3 @@
-import * as metaPNG from "meta-png";
 import nacl from "tweetnacl";
 import { fabric } from "fabric";
 
@@ -6,6 +5,7 @@ import {
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
   convertMetadataStringToUint8Array,
+  addMetadataFromBase64DataURL,
 } from "../utils/ImageUtil.mjs";
 import Dog from "../models/Dog.mjs";
 import GeneService from "./GeneService.mjs";
@@ -114,17 +114,17 @@ const buildDogFromDataURL = (dataURL) => {
 const generateDogPNGWithMetadata = (dog, canvas) => {
   let dataURL = canvas.toDataURL("png");
 
-  dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+  dataURL = addMetadataFromBase64DataURL(
     dataURL,
     "pawgenics_publicKey",
     dog.publicKey
   );
-  dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+  dataURL = addMetadataFromBase64DataURL(
     dataURL,
     "pawgenics_gene",
     JSON.stringify(dog.gene)
   );
-  dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+  dataURL = addMetadataFromBase64DataURL(
     dataURL,
     "pawgenics_signedHash",
     dog.signedHash
@@ -136,12 +136,12 @@ const generateDogPNGWithMetadata = (dog, canvas) => {
 const isValidDogPNG = (dataURL) => {
   const dogPNG = convertPNGDataURLToUint8Array(dataURL);
   try {
-    const geneMeta = metaPNG.default.getMetadata(dogPNG, "pawgenics_gene");
+    const geneMeta = getMetadataFromUint8Array(dogPNG, "pawgenics_gene");
     if (geneMeta === undefined) {
       return false;
     }
 
-    const publicKeyMeta = metaPNG.default.getMetadata(
+    const publicKeyMeta = getMetadataFromUint8Array(
       dogPNG,
       "pawgenics_publicKey"
     );
@@ -151,7 +151,7 @@ const isValidDogPNG = (dataURL) => {
 
     const publicKey = convertMetadataToUInt8Array(publicKeyMeta);
 
-    const signedHashMeta = metaPNG.default.getMetadata(
+    const signedHashMeta = getMetadataFromUint8Array(
       dogPNG,
       "pawgenics_signedHash"
     );
@@ -174,7 +174,7 @@ const generateProposalPNG = (canvas, secretKey, marriageId) => {
   let dataURL = canvas.toDataURL("png");
   const signedMarriageId = nacl.sign(marriageId, secretKey);
 
-  dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+  dataURL = addMetadataFromBase64DataURL(
     dataURL,
     "pawgenics_signedMarriageId",
     signedMarriageId
@@ -190,7 +190,7 @@ const generateApprovalPNG = (dogApprover, canvas, secretKey, marriageId) => {
   const appendedHash = appendHash(hash, dogApprover.publicKey, marriageId);
   const signedApprovalHash = nacl.sign(appendedHash, secretKey);
 
-  dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+  dataURL = addMetadataFromBase64DataURL(
     dataURL,
     "pawgenics_signedApprovalHash",
     signedApprovalHash
@@ -203,7 +203,7 @@ const generatePrivateKeyDataPNG = async (secretKey) => {
   const keyUrl = new URL("../assets/key.svg", import.meta.url).href;
   const keyImage = await constructKeyDataUrl(keyUrl);
 
-  return metaPNG.default.addMetadataFromBase64DataURI(
+  return addMetadataFromBase64DataURL(
     keyImage,
     "pawgenics_secretKey",
     secretKey

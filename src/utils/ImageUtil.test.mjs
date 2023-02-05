@@ -4,6 +4,7 @@ import {
   convertPNGDataURLToUint8Array,
   convertMetadataStringToUint8Array,
   getMetadataFromUint8Array,
+  addMetadataFromBase64DataURL,
 } from "./ImageUtil.mjs";
 
 describe("ImageUtils", () => {
@@ -33,6 +34,22 @@ describe("ImageUtils", () => {
     test("should return metadata from Uint8Array png", async () => {
       let dataURL = generateDataURLWithoutMetadata();
       dataURL = metaPNG.default.addMetadataFromBase64DataURI(
+        dataURL,
+        "pawgenics_gene",
+        "hello"
+      );
+      const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
+
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_gene")
+      ).toEqual("hello");
+    });
+  });
+
+  describe("addMetadataFromBase64DataURL", () => {
+    test("should return data url with metadata", async () => {
+      let dataURL = generateDataURLWithoutMetadata();
+      dataURL = addMetadataFromBase64DataURL(
         dataURL,
         "pawgenics_gene",
         "hello"
