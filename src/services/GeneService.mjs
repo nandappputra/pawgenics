@@ -57,6 +57,10 @@ const generateMarriageHashFromParents = (
   return nacl.hash(appendHash([parent1Hashed, parent2PublicKey]));
 };
 
+const generateDogHashFromParents = (marriageHash, parent1Hash, parent2Hash) => {
+  return nacl.hash(appendHash(marriageHash, parent1Hash, parent2Hash));
+};
+
 const constructPartFromHash = (part, hashUint8Array) => {
   return {
     variant: pickVariant(part, hashUint8Array[0]),
@@ -78,6 +82,7 @@ const GeneService = {
   buildDogGeneFromHash,
   generateSignedMarriageHashFromApproval,
   generateMarriageHashFromParents,
+  generateDogHashFromParents,
 };
 
 export default GeneService;
