@@ -24,7 +24,7 @@ const validateDogAuthenticity = (dog) => {
     dog.parent2SignedHash,
     dog.parent2PublicKey
   );
-  if (parent1Hash === null || parent2Hash == null) {
+  if (parent1Hash === null || parent2Hash === null) {
     throw "invalid parent hash";
   }
 
