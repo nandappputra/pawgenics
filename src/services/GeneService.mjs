@@ -1,5 +1,7 @@
+import nacl from "tweetnacl";
 import partProperties from "../assets/partConfiguration";
 import { PARTS } from "../utils/constants.mjs";
+import { appendHash } from "../utils/GeneUtil.mjs";
 
 const buildDogGeneFromHash = (hash) => {
   const gene = {};
@@ -34,6 +36,17 @@ const buildDogGeneFromHash = (hash) => {
   return gene;
 };
 
+const generateSignedMarriageHashFromApproval = (
+  approvalHash,
+  publicKey,
+  secretKey
+) => {
+  const appendedHash = appendHash([approvalHash, publicKey]);
+  const marriageHash = nacl.hash(appendedHash);
+
+  return nacl.sign(marriageHash, secretKey);
+};
+
 const constructPartFromHash = (part, hashUint8Array) => {
   return {
     variant: pickVariant(part, hashUint8Array[0]),
@@ -51,6 +64,9 @@ const pickColor = (r, g, b) => {
   return `rgb(${r},${g},${b})`;
 };
 
-const GeneService = { buildDogGeneFromHash };
+const GeneService = {
+  buildDogGeneFromHash,
+  generateSignedMarriageHashFromApproval,
+};
 
 export default GeneService;
