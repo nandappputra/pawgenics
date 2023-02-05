@@ -3,6 +3,7 @@ import {
   getMetadataFromUint8Array,
 } from "../utils/ImageUtil.mjs";
 import { METADATA } from "../utils/constants.mjs";
+import nacl from "tweetnacl";
 
 const validateMetadataPresence = (dataURL) => {
   const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
@@ -16,6 +17,14 @@ const validateMetadataPresence = (dataURL) => {
   });
 };
 
-const ValidatorService = { validateMetadataPresence };
+const validateDogAuthenticity = (dog) => {
+  const parent1Hash = nacl.sign.open(dog.parent1SignedHash, dog.publicKey);
+  const parent2Hash = nacl.sign.open(dog.parent2SignedHash, dog.publicKey);
+  if (parent1Hash === null || parent2Hash == null) {
+    throw `invalid parent hash`;
+  }
+};
+
+const ValidatorService = { validateMetadataPresence, validateDogAuthenticity };
 
 export default ValidatorService;

@@ -1,8 +1,12 @@
 import * as metaPNG from "meta-png";
 
 import ValidatorService from "./ValidatorService.mjs";
+import Dog from "../models/Dog.mjs";
+import nacl from "tweetnacl";
 
 describe("ValidatorService", () => {
+  const BLANK = null;
+
   describe("validateMetadataPresence", () => {
     test("should not throw error when there is no missing key", async () => {
       let dataURL = generateDataURLWithoutMetadata();
@@ -74,7 +78,7 @@ describe("ValidatorService", () => {
       ValidatorService.validateMetadataPresence(dataURL);
     });
 
-    test("should throw the error when there is a missing key", async () => {
+    test("should throw an error when there is a missing key", async () => {
       let dataURL = generateDataURLWithoutMetadata();
 
       const gene = { test: "hi" };
@@ -87,6 +91,36 @@ describe("ValidatorService", () => {
 
       expect(() => {
         ValidatorService.validateMetadataPresence(dataURL);
+      }).toThrow();
+    });
+  });
+
+  describe("validateDogAuthenticity", () => {
+    test("should throw an error when one of the parent hashes cannot be verified", async () => {
+      const keyPair1 = nacl.sign.keyPair();
+      const keyPair2 = nacl.sign.keyPair();
+
+      const textEncoder = new TextEncoder();
+
+      const message = textEncoder.encode("test dna");
+      const mockParent1Hash = nacl.sign(message, keyPair1.secretKey);
+      const mockParent2Hash = nacl.sign(message, keyPair2.secretKey);
+      const faultyPublicKey = new Uint8Array([1, 2, 3]);
+
+      const dog = new Dog(
+        BLANK,
+        BLANK,
+        keyPair1.publicKey,
+        BLANK,
+        BLANK,
+        faultyPublicKey,
+        mockParent1Hash,
+        mockParent2Hash,
+        BLANK
+      );
+
+      expect(() => {
+        ValidatorService.validateDogAuthenticity(dog);
       }).toThrow();
     });
   });
