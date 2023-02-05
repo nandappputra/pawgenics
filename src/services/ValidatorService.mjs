@@ -40,6 +40,15 @@ const validateDogAuthenticity = (dog) => {
   if (dogHash === null) {
     throw "invalid hash";
   }
+
+  const generatedHash = GeneService.generateDogHashFromParents(
+    marriageHash,
+    parent1Hash,
+    parent2Hash
+  );
+  if (generatedHash !== dogHash) {
+    throw "hash doesn't match";
+  }
 };
 
 const ValidatorService = { validateMetadataPresence, validateDogAuthenticity };
