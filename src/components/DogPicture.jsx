@@ -31,7 +31,7 @@ const DogPicture = ({ dog, id }) => {
       initCanvas();
       canvasRendered = true;
     }
-  }, []);
+  }, [dog]);
 
   const initCanvas = () => {
     const options = {

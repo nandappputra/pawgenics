@@ -1,6 +1,7 @@
 import React from "react";
 import Dog from "./models/Dog.mjs";
 import DogPicture from "./components/DogPicture";
+import Adopt from "./components/Adopt.jsx";
 
 const App = () => {
   const dogGenes1 = {
@@ -96,6 +97,7 @@ const App = () => {
   return (
     <div>
       Pawgenics
+      <Adopt />
       <DogPicture dog={dog1} id="dog1" />
       <DogPicture dog={dog2} id="dog2" />
       <DogPicture dog={dog3} id="dog3" />
