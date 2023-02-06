@@ -46,9 +46,19 @@ const validateDogAuthenticity = (dog) => {
     parent1Hash,
     parent2Hash
   );
-  if (generatedHash !== dogHash) {
+
+  if (!equalArrays(generatedHash, dogHash)) {
     throw "hash doesn't match";
   }
+};
+
+const equalArrays = (array1, array2) => {
+  return (
+    array1.length === array2.length &&
+    array1.every((value, index) => {
+      return value === array2[index];
+    })
+  );
 };
 
 const ValidatorService = { validateMetadataPresence, validateDogAuthenticity };

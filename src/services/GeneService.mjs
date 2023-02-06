@@ -1,7 +1,10 @@
 import nacl from "tweetnacl";
+import { v4 as uuidv4 } from "uuid";
+
 import partProperties from "../assets/partConfiguration";
 import { PARTS } from "../utils/constants.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
+import Dog from "../models/Dog.mjs";
 
 const buildDogGeneFromHash = (hash) => {
   const gene = {};
@@ -78,11 +81,56 @@ const pickColor = (r, g, b) => {
   return `rgb(${r},${g},${b})`;
 };
 
+const buildAdoptedDog = () => {
+  const parent1Hash = nacl.randomBytes(64);
+  const parent2Hash = nacl.randomBytes(64);
+
+  const parent1KeyPair = nacl.sign.keyPair();
+  const parent2KeyPair = nacl.sign.keyPair();
+
+  const parent1SignedHash = nacl.sign(parent1Hash, parent1KeyPair.secretKey);
+  const parent2SignedHash = nacl.sign(parent2Hash, parent2KeyPair.secretKey);
+
+  const encoder = new TextEncoder();
+
+  const marriageId = encoder.encode(uuidv4());
+  const marriageHash = generateMarriageHashFromParents(
+    marriageId,
+    parent1KeyPair.publicKey,
+    parent2KeyPair.publicKey
+  );
+  const signedMarriageHash = nacl.sign(marriageHash, parent2KeyPair.secretKey);
+
+  const hash = generateDogHashFromParents(
+    marriageHash,
+    parent1Hash,
+    parent2Hash
+  );
+  const signedHash = nacl.sign(hash, parent1KeyPair.secretKey);
+
+  const gene = buildDogGeneFromHash(hash);
+  const parent1Gene = buildDogGeneFromHash(parent1Hash);
+  const parent2Gene = buildDogGeneFromHash(parent2Hash);
+
+  return new Dog(
+    gene,
+    signedHash,
+    parent1KeyPair.publicKey,
+    parent1Gene,
+    parent2Gene,
+    parent2KeyPair.publicKey,
+    parent1SignedHash,
+    parent2SignedHash,
+    signedMarriageHash
+  );
+};
+
 const GeneService = {
   buildDogGeneFromHash,
   generateSignedMarriageHashFromApproval,
   generateMarriageHashFromParents,
   generateDogHashFromParents,
+  buildAdoptedDog,
 };
 
 export default GeneService;

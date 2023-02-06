@@ -2,6 +2,7 @@ import nacl from "tweetnacl";
 import { appendHash } from "../utils/GeneUtil.mjs";
 
 import GeneService from "./GeneService.mjs";
+import ValidatorService from "./ValidatorService.mjs";
 
 describe("GeneService", () => {
   describe("buildDogGeneFromHash", () => {
@@ -114,6 +115,14 @@ describe("GeneService", () => {
       ]);
 
       expect(actualResult).toStrictEqual(expectedResult);
+    });
+  });
+
+  describe("buildAdoptedDog", () => {
+    test("should return a valid dot", () => {
+      const adoptedDog = GeneService.buildAdoptedDog();
+
+      ValidatorService.validateDogAuthenticity(adoptedDog);
     });
   });
 });
