@@ -56,13 +56,13 @@ const generateMarriageHashFromParents = (
   parent1PublicKey,
   parent2PublicKey
 ) => {
-  const parent1Hashed = nacl.hash(appendHash(marriageId, parent1PublicKey));
+  const parent1Hashed = nacl.hash(appendHash([marriageId, parent1PublicKey]));
 
   return nacl.hash(appendHash([parent1Hashed, parent2PublicKey]));
 };
 
 const generateDogHashFromParents = (marriageHash, parent1Hash, parent2Hash) => {
-  return nacl.hash(appendHash(marriageHash, parent1Hash, parent2Hash));
+  return nacl.hash(appendHash([marriageHash, parent1Hash, parent2Hash]));
 };
 
 const constructPartFromHash = (part, hashUint8Array) => {

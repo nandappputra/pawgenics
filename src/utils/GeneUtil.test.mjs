@@ -11,5 +11,14 @@ describe("GeneUtil", () => {
 
       expect(actualResponse).toEqual(expectedResponse);
     });
+
+    test("should throw error given an invalid input", () => {
+      const array1 = new Uint8Array([1, 2, 3]);
+      const array2 = new Uint8Array([4, 5]);
+
+      expect(() => {
+        appendHash(array1, array2);
+      }).toThrow("invalid input");
+    });
   });
 });

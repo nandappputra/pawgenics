@@ -1,5 +1,10 @@
 export const appendHash = (uint8Arrays) => {
   const totalLength = uint8Arrays.reduce((sum, array) => sum + array.length, 0);
+
+  if (isNaN(totalLength)) {
+    throw "invalid input";
+  }
+
   const appendedHash = new Uint8Array(totalLength);
 
   let currentLength = 0;
