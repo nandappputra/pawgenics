@@ -2,7 +2,14 @@ import nacl from "tweetnacl";
 import { appendHash } from "../utils/GeneUtil.mjs";
 
 import GeneService from "./GeneService.mjs";
+import {
+  convertMetadataStringToUint8Array,
+  convertPNGDataURLToUint8Array,
+  getMetadataFromUint8Array,
+  addMetadataFromBase64DataURL,
+} from "../utils/ImageUtil.mjs";
 import ValidatorService from "./ValidatorService.mjs";
+import { METADATA } from "../utils/constants.mjs";
 
 describe("GeneService", () => {
   describe("buildDogGeneFromHash", () => {
@@ -119,10 +126,20 @@ describe("GeneService", () => {
   });
 
   describe("buildAdoptedDog", () => {
-    test("should return a valid dot", () => {
-      const adoptedDog = GeneService.buildAdoptedDog();
+    test("should return a valid dog", async () => {
+      const adoptedDogWithKey = await GeneService.buildAdoptedDog();
 
-      ValidatorService.validateDogAuthenticity(adoptedDog);
+      ValidatorService.validateDogAuthenticity(adoptedDogWithKey[0]);
+    });
+
+    test("should return a PNG with secret key in its metadata", async () => {
+      const adoptedDogWithKey = await GeneService.buildAdoptedDog();
+
+      const pngUint8Array = convertPNGDataURLToUint8Array(adoptedDogWithKey[1]);
+
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, "pawgenics_secretKey")
+      ).toBeDefined();
     });
   });
 });

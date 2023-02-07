@@ -5,6 +5,7 @@ import partProperties from "../assets/partConfiguration";
 import { PARTS } from "../utils/constants.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
 import Dog from "../models/Dog.mjs";
+import ImageService from "./ImageService.mjs";
 
 const buildDogGeneFromHash = (hash) => {
   const gene = {};
@@ -81,7 +82,7 @@ const pickColor = (r, g, b) => {
   return `rgb(${r},${g},${b})`;
 };
 
-const buildAdoptedDog = () => {
+const buildAdoptedDog = async () => {
   const parent1Hash = nacl.randomBytes(64);
   const parent2Hash = nacl.randomBytes(64);
 
@@ -112,17 +113,24 @@ const buildAdoptedDog = () => {
   const parent1Gene = buildDogGeneFromHash(parent1Hash);
   const parent2Gene = buildDogGeneFromHash(parent2Hash);
 
-  return new Dog(
-    gene,
-    signedHash,
-    parent1KeyPair.publicKey,
-    parent1Gene,
-    parent2Gene,
-    parent2KeyPair.publicKey,
-    parent1SignedHash,
-    parent2SignedHash,
-    signedMarriageHash
+  const key = await ImageService.generatePrivateKeyDataPNG(
+    parent1KeyPair.secretKey
   );
+
+  return [
+    new Dog(
+      gene,
+      signedHash,
+      parent1KeyPair.publicKey,
+      parent1Gene,
+      parent2Gene,
+      parent2KeyPair.publicKey,
+      parent1SignedHash,
+      parent2SignedHash,
+      signedMarriageHash
+    ),
+    key,
+  ];
 };
 
 const GeneService = {
