@@ -10,6 +10,7 @@ import {
 import Dog from "../models/Dog.mjs";
 import GeneService from "./GeneService.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
+import { METADATA } from "../utils/constants.mjs";
 
 const buildDogFromDataURL = (dataURL) => {
   const pngArray = convertPNGDataURLToUint8Array(dataURL);
@@ -116,18 +117,48 @@ const generateDogPNGWithMetadata = (dog, canvas) => {
 
   dataURL = addMetadataFromBase64DataURL(
     dataURL,
-    "pawgenics_publicKey",
-    dog.publicKey
-  );
-  dataURL = addMetadataFromBase64DataURL(
-    dataURL,
-    "pawgenics_gene",
+    METADATA.GENE,
     JSON.stringify(dog.gene)
   );
   dataURL = addMetadataFromBase64DataURL(
     dataURL,
-    "pawgenics_signedHash",
+    METADATA.SIGNED_HASH,
     dog.signedHash
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PUBLIC_KEY,
+    dog.publicKey
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PARENT_1_GENE,
+    JSON.stringify(dog.parent1Gene)
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PARENT_2_GENE,
+    JSON.stringify(dog.parent2Gene)
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PARENT_2_PUBLIC_KEY,
+    dog.parent2PublicKey
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PARENT_1_SIGNED_HASH,
+    dog.parent1SignedHash
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PARENT_2_SIGNED_HASH,
+    dog.parent2SignedHash
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.PARENT_MARRIAGE_HASH,
+    dog.parentMarriageHash
   );
 
   return dataURL;

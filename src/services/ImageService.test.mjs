@@ -10,25 +10,47 @@ import {
   addMetadataFromBase64DataURL,
 } from "../utils/ImageUtil.mjs";
 import ImageService from "./ImageService.mjs";
+import { METADATA } from "../utils/constants.mjs";
+import GeneService from "./GeneService.mjs";
 
 describe("ImageService", () => {
   describe("generateDogPNGWithMetadata", () => {
-    test("should return a Dog PNG with gene, signed hash, and public key in its metadata", async () => {
-      const dogWithKey = await Dog.buildDog("test", "random");
-      const dog = dogWithKey[0];
+    test("should return a Dog PNG with complete metadata", () => {
+      const dog = GeneService.buildAdoptedDog();
       const canvas = new fabric.Canvas();
 
       const response = ImageService.generateDogPNGWithMetadata(dog, canvas);
       const pngUint8Array = convertPNGDataURLToUint8Array(response);
 
       expect(
-        getMetadataFromUint8Array(pngUint8Array, "pawgenics_gene")
+        getMetadataFromUint8Array(pngUint8Array, METADATA.GENE)
       ).toBeDefined();
       expect(
-        getMetadataFromUint8Array(pngUint8Array, "pawgenics_signedHash")
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PUBLIC_KEY)
       ).toBeDefined();
       expect(
-        getMetadataFromUint8Array(pngUint8Array, "pawgenics_publicKey")
+        getMetadataFromUint8Array(pngUint8Array, METADATA.SIGNED_HASH)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_1_GENE)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_2_GENE)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_2_PUBLIC_KEY)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_2_SIGNED_HASH)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_1_SIGNED_HASH)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_2_SIGNED_HASH)
+      ).toBeDefined();
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.PARENT_MARRIAGE_HASH)
       ).toBeDefined();
     });
   });
