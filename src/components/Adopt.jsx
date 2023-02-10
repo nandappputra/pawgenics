@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import Dog from "../models/Dog.mjs";
-import { v4 as uuidv4 } from "uuid";
 import DogPicture from "./DogPicture.jsx";
+import GeneService from "../services/GeneService.mjs";
 
 const Adopt = () => {
   const [adoptedDog, setAdoptedDog] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
 
   const generateDog = async () => {
-    const [dog, key] = await Dog.buildDog("test", uuidv4());
+    const [dog, key] = await GeneService.buildAdoptedDog();
+    console.log(dog);
     setAdoptedDog(dog);
     setPrivateKey(key);
   };
