@@ -15,7 +15,11 @@ export const convertMetadataStringToUint8Array = (metadata) => {
 };
 
 export const getMetadataFromUint8Array = (pngUint8Array, key) => {
-  return metaPNG.default.getMetadata(pngUint8Array, key);
+  if (metaPNG.default) {
+    return metaPNG.default.getMetadata(pngUint8Array, key);
+  }
+
+  return metaPNG.getMetadata(pngUint8Array, key);
 };
 
 export const addMetadataFromBase64DataURL = (dataURL, key, value) => {
