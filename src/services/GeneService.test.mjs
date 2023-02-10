@@ -60,7 +60,7 @@ describe("GeneService", () => {
     });
   });
 
-  describe("generateMarriageHashFromParents", () => {
+  describe("generateMarriageHash", () => {
     test("should return deterministic hash based on marriage id and parent information", () => {
       const encoder = new TextEncoder();
 
@@ -79,7 +79,7 @@ describe("GeneService", () => {
         ],
       ]);
 
-      const actualResult = GeneService.generateMarriageHashFromParents(
+      const actualResult = GeneService.generateMarriageHash(
         marriageId,
         publicKey1,
         publicKey2

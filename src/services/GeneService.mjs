@@ -51,7 +51,7 @@ const generateSignedMarriageHashFromApproval = (
   return nacl.sign(marriageHash, secretKey);
 };
 
-const generateMarriageHashFromParents = (
+const generateMarriageHash = (
   marriageId,
   parent1PublicKey,
   parent2PublicKey
@@ -95,7 +95,7 @@ const buildAdoptedDog = async () => {
   const encoder = new TextEncoder();
 
   const marriageId = encoder.encode(uuidv4());
-  const marriageHash = generateMarriageHashFromParents(
+  const marriageHash = generateMarriageHash(
     marriageId,
     parent1KeyPair.publicKey,
     parent2KeyPair.publicKey
@@ -136,7 +136,7 @@ const buildAdoptedDog = async () => {
 const GeneService = {
   buildDogGeneFromHash,
   generateSignedMarriageHashFromApproval,
-  generateMarriageHashFromParents,
+  generateMarriageHash,
   generateDogHashFromParents,
   buildAdoptedDog,
 };
