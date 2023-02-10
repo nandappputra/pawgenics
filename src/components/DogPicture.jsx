@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { fabric } from "fabric";
 import partProperties from "../assets/partConfiguration";
+import ImageService from "../services/ImageService.mjs";
 
 const DogPicture = ({ dog, id }) => {
   const CANVAS_WITDH = 300;
@@ -107,7 +108,7 @@ const DogPicture = ({ dog, id }) => {
   };
 
   const handleDownload = () => {
-    const dataURL = canvas.toDataURL("png");
+    const dataURL = ImageService.generateDogPNGWithMetadata(dog, canvas);
     const link = document.createElement("a");
     link.download = "image.png";
     link.href = dataURL;
