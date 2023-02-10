@@ -142,22 +142,38 @@ describe("ImageService", () => {
 
   describe("generateApprovalPNG", () => {
     test("should return a PNG with hashed marriage ID", async () => {
-      const [dog, key] = await Dog.buildDog("test", "random");
+      const canvas = new fabric.Canvas();
+      const [parent1, key1] = await GeneService.buildAdoptedDog();
+      const [parent2, key2] = await GeneService.buildAdoptedDog();
 
-      const keyArray = convertPNGDataURLToUint8Array(key);
-      const secretKeyString = getMetadataFromUint8Array(
-        keyArray,
+      let parent1DataURL = ImageService.generateDogPNGWithMetadata(
+        parent1,
+        canvas
+      );
+      const parent2DataURL = ImageService.generateDogPNGWithMetadata(
+        parent2,
+        canvas
+      );
+
+      const encoder = new TextEncoder();
+      const uuid = encoder.encode(uuidv4());
+      const parent1KeyUint8Array = convertPNGDataURLToUint8Array(key1);
+      const parent1KeyString = getMetadataFromUint8Array(
+        parent1KeyUint8Array,
         "pawgenics_secretKey"
       );
-      const secretKey = convertMetadataStringToUint8Array(secretKeyString);
-      const canvas = new fabric.Canvas();
-      const randomUuid = uuidParse(uuidv4());
+
+      const parent1Key = convertMetadataStringToUint8Array(parent1KeyString);
+      parent1DataURL = addMetadataFromBase64DataURL(
+        parent1DataURL,
+        "pawgenics_signedMarriageId",
+        nacl.sign(uuid, parent1Key)
+      );
 
       const response = ImageService.generateApprovalPNG(
-        dog,
-        canvas,
-        secretKey,
-        randomUuid
+        parent1DataURL,
+        parent2DataURL,
+        key2
       );
       const pngUint8Array = convertPNGDataURLToUint8Array(response);
 

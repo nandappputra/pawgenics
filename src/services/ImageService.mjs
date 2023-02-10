@@ -213,15 +213,41 @@ const generateProposalPNG = (dataURL, secretKey, marriageId) => {
   return dataURL;
 };
 
-const generateApprovalPNG = (dogApprover, canvas, secretKey, marriageId) => {
-  let dataURL = canvas.toDataURL("png");
+const generateApprovalPNG = (
+  proposerDataURL,
+  approverDataURL,
+  approverSecretKeyDataURL
+) => {
+  const proposerUint8Array = convertPNGDataURLToUint8Array(proposerDataURL);
+  const approverUint8Array = convertPNGDataURLToUint8Array(approverDataURL);
+  const approverSecretUint8Array = convertPNGDataURLToUint8Array(
+    approverSecretKeyDataURL
+  );
 
-  const hash = nacl.sign.open(dogApprover.signedHash, dogApprover.publicKey);
-  const appendedHash = appendHash([hash, dogApprover.publicKey, marriageId]);
-  const signedApprovalHash = nacl.sign(appendedHash, secretKey);
+  const proposerPublicKey = convertMetadataStringToUint8Array(
+    getMetadataFromUint8Array(proposerUint8Array, METADATA.PUBLIC_KEY)
+  );
+  const approverPublicKey = convertMetadataStringToUint8Array(
+    getMetadataFromUint8Array(approverUint8Array, METADATA.PUBLIC_KEY)
+  );
+  const approverSecretKey = convertMetadataStringToUint8Array(
+    getMetadataFromUint8Array(approverSecretUint8Array, "pawgenics_secretKey")
+  );
 
-  dataURL = addMetadataFromBase64DataURL(
-    dataURL,
+  const signedMarriageId = convertMetadataToUInt8Array(
+    getMetadataFromUint8Array(proposerUint8Array, "pawgenics_signedMarriageId")
+  );
+  const marriageId = nacl.sign.open(signedMarriageId, proposerPublicKey);
+
+  const appendedHash = GeneService.generateMarriageHash(
+    marriageId,
+    proposerPublicKey,
+    approverPublicKey
+  );
+  const signedApprovalHash = nacl.sign(appendedHash, approverSecretKey);
+
+  const dataURL = addMetadataFromBase64DataURL(
+    approverDataURL,
     "pawgenics_signedApprovalHash",
     signedApprovalHash
   );
