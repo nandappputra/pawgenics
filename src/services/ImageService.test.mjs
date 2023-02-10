@@ -140,7 +140,7 @@ describe("ImageService", () => {
     });
   });
 
-  describe("generateProposalPNG", () => {
+  describe("generateApprovalPNG", () => {
     test("should return a PNG with hashed marriage ID", async () => {
       const [dog, key] = await Dog.buildDog("test", "random");
 
@@ -167,14 +167,14 @@ describe("ImageService", () => {
     });
   });
 
-  describe("generateApprovalPNG", () => {
-    test("should return a PNG with hashed approval", () => {
-      const canvas = new fabric.Canvas();
+  describe("generateProposalPNG", () => {
+    test("should return a PNG with hashed approval", async () => {
+      const dataURL = generateDataURLWithoutMetadata();
       const randomUuid = uuidParse(uuidv4());
       const keyPair = nacl.sign.keyPair();
 
       const response = ImageService.generateProposalPNG(
-        canvas,
+        dataURL,
         keyPair.secretKey,
         randomUuid
       );

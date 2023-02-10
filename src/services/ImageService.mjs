@@ -201,8 +201,7 @@ const isValidDogPNG = (dataURL) => {
   }
 };
 
-const generateProposalPNG = (canvas, secretKey, marriageId) => {
-  let dataURL = canvas.toDataURL("png");
+const generateProposalPNG = (dataURL, secretKey, marriageId) => {
   const signedMarriageId = nacl.sign(marriageId, secretKey);
 
   dataURL = addMetadataFromBase64DataURL(
@@ -218,7 +217,7 @@ const generateApprovalPNG = (dogApprover, canvas, secretKey, marriageId) => {
   let dataURL = canvas.toDataURL("png");
 
   const hash = nacl.sign.open(dogApprover.signedHash, dogApprover.publicKey);
-  const appendedHash = appendHash(hash, dogApprover.publicKey, marriageId);
+  const appendedHash = appendHash([hash, dogApprover.publicKey, marriageId]);
   const signedApprovalHash = nacl.sign(appendedHash, secretKey);
 
   dataURL = addMetadataFromBase64DataURL(
