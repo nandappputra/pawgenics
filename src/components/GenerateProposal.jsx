@@ -3,6 +3,7 @@ import { FileUploader } from "react-drag-drop-files";
 import { v4 as uuidv4 } from "uuid";
 
 import ImageService from "../services/ImageService.mjs";
+import { METADATA } from "../utils/constants.mjs";
 import {
   convertPNGDataURLToUint8Array,
   convertMetadataStringToUint8Array,
@@ -34,7 +35,7 @@ const GenerateProposal = () => {
     const keyUint8Array = convertPNGDataURLToUint8Array(key);
     const secretKeyString = getMetadataFromUint8Array(
       keyUint8Array,
-      "pawgenics_secretKey"
+      METADATA.SECRET_KEY
     );
 
     const secretKey = convertMetadataStringToUint8Array(secretKeyString);
