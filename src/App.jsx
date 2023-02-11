@@ -3,34 +3,49 @@ import Adopt from "./components/Adopt.jsx";
 import { Link, Route, Routes } from "react-router-dom";
 import Home from "./components/Home.jsx";
 import Breed from "./components/Breed.jsx";
+import { Container, Navbar, Nav } from "react-bootstrap";
 
 const App = () => {
+  const linkStyle = { color: "black", textDecoration: "none" };
+
+  const padding = { padding: "0.5em" };
   const nav = () => {
     return (
-      <div>
-        <Link style={{ padding: "1em" }} to="/">
-          Home
-        </Link>
-        <Link style={{ padding: "1em" }} to="/adopt">
-          Adopt
-        </Link>
-        <Link style={{ padding: "1em" }} to="/breed">
-          Breed
-        </Link>
-      </div>
+      <Navbar bg="light" sticky="top">
+        <Container>
+          <Navbar.Brand>Pawgenics</Navbar.Brand>
+          <Nav className="me-auto">
+            <Nav.Item style={padding}>
+              <Link to="/" style={linkStyle}>
+                Home
+              </Link>
+            </Nav.Item>
+            <Nav.Item style={padding}>
+              <Link to="/adopt" style={linkStyle}>
+                Adopt
+              </Link>
+            </Nav.Item>
+            <Nav.Item style={padding}>
+              <Link to="/breed" style={linkStyle}>
+                Breed
+              </Link>
+            </Nav.Item>
+          </Nav>
+        </Container>
+      </Navbar>
     );
   };
 
   return (
     <div>
-      Pawgenics
       {nav()}
-      <Routes>
-        <Route path="/" element={<Home />} />
-
-        <Route path="/adopt" element={<Adopt />} />
-        <Route path="/breed" element={<Breed />} />
-      </Routes>
+      <Container>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/adopt" element={<Adopt />} />
+          <Route path="/breed" element={<Breed />} />
+        </Routes>
+      </Container>
     </div>
   );
 };

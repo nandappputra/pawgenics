@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Container, Button } from "react-bootstrap";
 import { FileUploader } from "react-drag-drop-files";
+
 import ImageService from "../services/ImageService.mjs";
 
 const GenerateApproval = () => {
@@ -36,69 +38,73 @@ const GenerateApproval = () => {
     setApproval(ImageService.generateApprovalPNG(proposal, dog, key));
   };
 
+  const style = { padding: "0.75em" };
+
   return (
-    <div>
-      <h2>2. Approve Proposal</h2>
-      {proposal ? (
+    <Container className="text-center">
+      {approval === null ? (
         <div>
-          <img src={proposal} />
+          <div style={style}>
+            <h4>Place the proposal here</h4>
+            {proposal ? (
+              <img src={proposal} style={{ borderRadius: "10%" }} />
+            ) : (
+              <FileUploader
+                handleChange={receiveProposal}
+                name="file"
+                types={["PNG"]}
+              />
+            )}
+          </div>
+
+          <div style={style}>
+            {proposal && (
+              <div>
+                <h4>Place your dog here</h4>
+                {dog ? (
+                  <img src={dog} style={{ borderRadius: "10%" }} />
+                ) : (
+                  <FileUploader
+                    handleChange={receiveDog}
+                    name="file"
+                    types={["PNG"]}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+
+          <div style={style}>
+            {dog && (
+              <div>
+                <h4>Place your key here</h4>
+                {key ? (
+                  <img src={key} />
+                ) : (
+                  <FileUploader
+                    handleChange={receiveKey}
+                    name="file"
+                    types={["PNG"]}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+
+          {proposal && dog && key && (
+            <div>
+              <Button onClick={generateApprovalImage}>Approve!</Button>
+            </div>
+          )}
         </div>
       ) : (
         <div>
-          <h3>Place the proposal here</h3>
-          <FileUploader
-            handleChange={receiveProposal}
-            name="file"
-            types={["PNG"]}
-          />
-        </div>
-      )}
-
-      {proposal &&
-        (dog ? (
-          <div>
-            <img src={dog} />
-          </div>
-        ) : (
-          <div>
-            <h3>Place your dog here</h3>
-            <FileUploader
-              handleChange={receiveDog}
-              name="file"
-              types={["PNG"]}
-            />
-          </div>
-        ))}
-
-      {dog &&
-        (key ? (
-          <div>
-            <img src={key} />
-          </div>
-        ) : (
-          <div>
-            <h3>Place your key here</h3>
-            <FileUploader
-              handleChange={receiveKey}
-              name="file"
-              types={["PNG"]}
-            />
-          </div>
-        ))}
-
-      {proposal && dog && key && (
-        <div>
-          <h3>Click to approve proposal!</h3>
-          <button onClick={generateApprovalImage}>Approve!</button>
-        </div>
-      )}
-
-      {approval && (
-        <div>
+          <h3>Your approval is ready!</h3>
+          <p>Save and share your approval to the original proposer!</p>
           <img src={approval} />
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 

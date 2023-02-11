@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Container } from "react-bootstrap";
 import { FileUploader } from "react-drag-drop-files";
 import { v4 as uuidv4 } from "uuid";
+import { Button } from "react-bootstrap";
 
 import ImageService from "../services/ImageService.mjs";
 import { METADATA } from "../utils/constants.mjs";
@@ -44,43 +46,60 @@ const GenerateProposal = () => {
     setProposal(ImageService.generateProposalPNG(dog, secretKey, uuid));
   };
 
+  const style = { padding: "0.75em" };
+
   return (
-    <div>
-      <h2>1. Generate proposal</h2>
-      <h3>Place your dog here</h3>
-      {dog ? (
-        <img src={dog} />
-      ) : (
-        <FileUploader handleChange={receiveDog} name="file" types={["PNG"]} />
-      )}
-      {dog &&
-        (key ? (
-          <div>
-            <img src={key} />
-          </div>
-        ) : (
-          <div>
-            <h3>Place your key here</h3>
-            <FileUploader
-              handleChange={receiveKey}
-              name="file"
-              types={["PNG"]}
-            />
-          </div>
-        ))}
-      {dog && key && (
+    <Container className="text-center">
+      {proposal === null ? (
         <div>
-          <h3>Click here to generate your proposal!</h3>
-          <button onClick={generateProposalImage}>Generate Proposal</button>
+          <div style={style}>
+            <h4>Place your dog here</h4>
+            {dog ? (
+              <img src={dog} style={{ borderRadius: "10%" }} />
+            ) : (
+              <FileUploader
+                handleChange={receiveDog}
+                name="file"
+                types={["PNG"]}
+              />
+            )}
+          </div>
+
+          <div style={style}>
+            {dog && (
+              <div>
+                <h4>Place your key here</h4>
+                {key ? (
+                  <div>
+                    <img src={key} />
+                  </div>
+                ) : (
+                  <div>
+                    <FileUploader
+                      handleChange={receiveKey}
+                      name="file"
+                      types={["PNG"]}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {dog && key && (
+            <div>
+              <Button onClick={generateProposalImage}>Generate Proposal</Button>
+            </div>
+          )}
         </div>
-      )}
-      {proposal && (
+      ) : (
         <div>
           <h3>Your proposal is ready!</h3>
-          <img src={proposal} />
+          <p>Save and share them with the world!</p>
+          <img src={proposal} style={{ borderRadius: "10%" }} />
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 
