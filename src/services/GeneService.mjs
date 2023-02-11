@@ -133,12 +133,57 @@ const buildAdoptedDog = async () => {
   ];
 };
 
+const buildDogFromMarriage = async (
+  proposerDog,
+  approverDog,
+  proposerSecretKey
+) => {
+  const proposerHash = nacl.sign.open(
+    proposerDog.signedHash,
+    proposerDog.publicKey
+  );
+  const approverHash = nacl.sign.open(
+    approverDog.signedHash,
+    approverDog.publicKey
+  );
+
+  const marriageHash = nacl.sign.open(
+    approverDog.signedApprovalHash,
+    approverDog.publicKey
+  );
+
+  const hash = generateDogHashFromParents(
+    marriageHash,
+    proposerHash,
+    approverHash
+  );
+  const signedHash = nacl.sign(hash, proposerSecretKey);
+
+  const key = await ImageService.generatePrivateKeyDataPNG(proposerSecretKey);
+
+  return [
+    new Dog(
+      buildDogGeneFromHash(hash),
+      signedHash,
+      proposerDog.publicKey,
+      buildDogGeneFromHash(proposerHash),
+      buildDogGeneFromHash(approverHash),
+      approverDog.publicKey,
+      proposerDog.signedHash,
+      approverDog.signedHash,
+      approverDog.signedApprovalHash
+    ),
+    key,
+  ];
+};
+
 const GeneService = {
   buildDogGeneFromHash,
   generateSignedMarriageHashFromApproval,
   generateMarriageHash,
   generateDogHashFromParents,
   buildAdoptedDog,
+  buildDogFromMarriage,
 };
 
 export default GeneService;

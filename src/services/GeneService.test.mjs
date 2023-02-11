@@ -1,15 +1,17 @@
 import nacl from "tweetnacl";
 import { appendHash } from "../utils/GeneUtil.mjs";
+import { v4 as uuidv4 } from "uuid";
+import { fabric } from "fabric";
 
 import GeneService from "./GeneService.mjs";
 import {
   convertMetadataStringToUint8Array,
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
-  addMetadataFromBase64DataURL,
 } from "../utils/ImageUtil.mjs";
 import ValidatorService from "./ValidatorService.mjs";
 import { METADATA } from "../utils/constants.mjs";
+import ImageService from "./ImageService.mjs";
 
 describe("GeneService", () => {
   describe("buildDogGeneFromHash", () => {
@@ -137,8 +139,80 @@ describe("GeneService", () => {
       const pngUint8Array = convertPNGDataURLToUint8Array(adoptedDogWithKey[1]);
 
       expect(
-        getMetadataFromUint8Array(pngUint8Array, "pawgenics_secretKey")
+        getMetadataFromUint8Array(pngUint8Array, METADATA.SECRET_KEY)
       ).toBeDefined();
     });
   });
+
+  describe("buildDogFromMarriage", () => {
+    test("should return a valid dog", async () => {
+      const [proposerDog, approverDog, secretKey] =
+        await buildProposerApproverAndSecretKey();
+
+      const generatedDog = await GeneService.buildDogFromMarriage(
+        proposerDog,
+        approverDog,
+        secretKey
+      );
+
+      ValidatorService.validateDogAuthenticity(generatedDog[0]);
+    });
+
+    test("should return a PNG with secret key in its metadata", async () => {
+      const [proposerDog, approverDog, secretKey] =
+        await buildProposerApproverAndSecretKey();
+
+      const generatedDog = await GeneService.buildDogFromMarriage(
+        proposerDog,
+        approverDog,
+        secretKey
+      );
+
+      const pngUint8Array = convertPNGDataURLToUint8Array(generatedDog[1]);
+
+      expect(
+        getMetadataFromUint8Array(pngUint8Array, METADATA.SECRET_KEY)
+      ).toBeDefined();
+    });
+  });
+
+  const buildProposerApproverAndSecretKey = async () => {
+    const canvas = new fabric.Canvas();
+    const proposer = await GeneService.buildAdoptedDog();
+    const approver = await GeneService.buildAdoptedDog();
+
+    const keyUint8Array = convertPNGDataURLToUint8Array(proposer[1]);
+    const secretKeyString = getMetadataFromUint8Array(
+      keyUint8Array,
+      METADATA.SECRET_KEY
+    );
+    const secretKey = convertMetadataStringToUint8Array(secretKeyString);
+    const encoder = new TextEncoder();
+    const uuid = encoder.encode(uuidv4());
+
+    const proposerDataURL = ImageService.generateDogPNGWithMetadata(
+      proposer[0],
+      canvas
+    );
+    const proposal = ImageService.generateProposalPNG(
+      proposerDataURL,
+      secretKey,
+      uuid
+    );
+
+    const approverDataURL = ImageService.generateDogPNGWithMetadata(
+      approver[0],
+      canvas
+    );
+    const approval = ImageService.generateApprovalPNG(
+      proposal,
+      approverDataURL,
+      approver[1]
+    );
+
+    const proposerDog = ImageService.buildDogFromDataURL(proposal);
+    const approverDog = ImageService.buildDogFromDataURL(approval);
+
+    return [proposerDog, approverDog, secretKey];
+  };
 });
