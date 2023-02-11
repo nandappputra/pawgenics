@@ -22,16 +22,18 @@ const buildDogFromDataURL = (dataURL) => {
     parent2PublicKey = null,
     parent1SignedHash = null,
     parent2SignedHash = null,
-    parentMarriageHash = null;
+    parentMarriageHash = null,
+    signedMarriageId = null,
+    signedApprovalHash = null;
 
-  const geneMeta = getMetadataFromUint8Array(pngArray, "pawgenics_gene");
+  const geneMeta = getMetadataFromUint8Array(pngArray, METADATA.GENE);
   if (geneMeta) {
     gene = JSON.parse(geneMeta);
   }
 
   const signedHashMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_signedHash"
+    METADATA.SIGNED_HASH
   );
   if (signedHashMeta) {
     signedHash = convertMetadataStringToUint8Array(signedHashMeta);
@@ -39,7 +41,7 @@ const buildDogFromDataURL = (dataURL) => {
 
   const publicKeyMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_publicKey"
+    METADATA.PUBLIC_KEY
   );
   if (publicKeyMeta) {
     publicKey = convertMetadataStringToUint8Array(publicKeyMeta);
@@ -47,7 +49,7 @@ const buildDogFromDataURL = (dataURL) => {
 
   const parent1GeneMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_parent1Gene"
+    METADATA.PARENT_1_GENE
   );
   if (parent1GeneMeta) {
     parent1Gene = JSON.parse(parent1GeneMeta);
@@ -55,7 +57,7 @@ const buildDogFromDataURL = (dataURL) => {
 
   const parent2GeneMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_parent2Gene"
+    METADATA.PARENT_2_GENE
   );
   if (parent2GeneMeta) {
     parent2Gene = JSON.parse(parent2GeneMeta);
@@ -63,7 +65,7 @@ const buildDogFromDataURL = (dataURL) => {
 
   const parent2PulicKeyMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_parent2PublicKey"
+    METADATA.PARENT_2_PUBLIC_KEY
   );
   if (parent2PulicKeyMeta) {
     parent2PublicKey = convertMetadataStringToUint8Array(parent2PulicKeyMeta);
@@ -71,7 +73,7 @@ const buildDogFromDataURL = (dataURL) => {
 
   const parent1SignedHashMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_parent1SignedHash"
+    METADATA.PARENT_1_SIGNED_HASH
   );
   if (parent1SignedHashMeta) {
     parent1SignedHash = convertMetadataStringToUint8Array(
@@ -81,7 +83,7 @@ const buildDogFromDataURL = (dataURL) => {
 
   const parent2SignedHashMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_parent2SignedHash"
+    METADATA.PARENT_2_SIGNED_HASH
   );
   if (parent2SignedHashMeta) {
     parent2SignedHash = convertMetadataStringToUint8Array(
@@ -91,11 +93,29 @@ const buildDogFromDataURL = (dataURL) => {
 
   const parentMarriageHashMeta = getMetadataFromUint8Array(
     pngArray,
-    "pawgenics_parentMarriageHash"
+    METADATA.PARENT_MARRIAGE_HASH
   );
   if (parentMarriageHashMeta) {
     parentMarriageHash = convertMetadataStringToUint8Array(
       parentMarriageHashMeta
+    );
+  }
+
+  const signedMarriageIdMeta = getMetadataFromUint8Array(
+    pngArray,
+    METADATA.SIGNED_MARRIAGE_ID
+  );
+  if (signedMarriageIdMeta) {
+    signedMarriageId = convertMetadataStringToUint8Array(signedMarriageIdMeta);
+  }
+
+  const signedApprovalHashMeta = getMetadataFromUint8Array(
+    pngArray,
+    METADATA.SIGNED_APPROVAL_HASH
+  );
+  if (signedApprovalHashMeta) {
+    signedApprovalHash = convertMetadataStringToUint8Array(
+      signedApprovalHashMeta
     );
   }
 
@@ -108,7 +128,9 @@ const buildDogFromDataURL = (dataURL) => {
     parent2PublicKey,
     parent1SignedHash,
     parent2SignedHash,
-    parentMarriageHash
+    parentMarriageHash,
+    signedMarriageId,
+    signedApprovalHash
   );
 };
 
@@ -206,7 +228,7 @@ const generateProposalPNG = (dataURL, secretKey, marriageId) => {
 
   dataURL = addMetadataFromBase64DataURL(
     dataURL,
-    "pawgenics_signedMarriageId",
+    METADATA.SIGNED_MARRIAGE_ID,
     signedMarriageId
   );
 
@@ -231,11 +253,11 @@ const generateApprovalPNG = (
     getMetadataFromUint8Array(approverUint8Array, METADATA.PUBLIC_KEY)
   );
   const approverSecretKey = convertMetadataStringToUint8Array(
-    getMetadataFromUint8Array(approverSecretUint8Array, "pawgenics_secretKey")
+    getMetadataFromUint8Array(approverSecretUint8Array, METADATA.SECRET_KEY)
   );
 
   const signedMarriageId = convertMetadataToUInt8Array(
-    getMetadataFromUint8Array(proposerUint8Array, "pawgenics_signedMarriageId")
+    getMetadataFromUint8Array(proposerUint8Array, METADATA.SIGNED_MARRIAGE_ID)
   );
   const marriageId = nacl.sign.open(signedMarriageId, proposerPublicKey);
 
@@ -248,7 +270,7 @@ const generateApprovalPNG = (
 
   const dataURL = addMetadataFromBase64DataURL(
     approverDataURL,
-    "pawgenics_signedApprovalHash",
+    METADATA.SIGNED_APPROVAL_HASH,
     signedApprovalHash
   );
 
@@ -259,11 +281,7 @@ const generatePrivateKeyDataPNG = async (secretKey) => {
   const keyUrl = new URL("../assets/key.svg", import.meta.url).href;
   const keyImage = await constructKeyDataUrl(keyUrl);
 
-  return addMetadataFromBase64DataURL(
-    keyImage,
-    "pawgenics_secretKey",
-    secretKey
-  );
+  return addMetadataFromBase64DataURL(keyImage, METADATA.SECRET_KEY, secretKey);
 };
 
 const constructKeyDataUrl = (url) => {

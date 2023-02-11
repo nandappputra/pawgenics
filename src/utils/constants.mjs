@@ -43,4 +43,7 @@ export const METADATA = {
   PARENT_1_SIGNED_HASH: "pawgenics_parent1SignedHash",
   PARENT_2_SIGNED_HASH: "pawgenics_parent2SignedHash",
   PARENT_MARRIAGE_HASH: "pawgenics_parentMarriageHash",
+  SECRET_KEY: "pawgenics_secretKey",
+  SIGNED_MARRIAGE_ID: "pawgenics_signedMarriageId",
+  SIGNED_APPROVAL_HASH: "pawgenics_signedApprovalHash",
 };

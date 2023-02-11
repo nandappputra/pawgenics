@@ -15,11 +15,11 @@ import GeneService from "./GeneService.mjs";
 
 describe("ImageService", () => {
   describe("generateDogPNGWithMetadata", () => {
-    test("should return a Dog PNG with complete metadata", () => {
-      const dog = GeneService.buildAdoptedDog();
+    test("should return a Dog PNG with complete metadata", async () => {
+      const dog = await GeneService.buildAdoptedDog();
       const canvas = new fabric.Canvas();
 
-      const response = ImageService.generateDogPNGWithMetadata(dog, canvas);
+      const response = ImageService.generateDogPNGWithMetadata(dog[0], canvas);
       const pngUint8Array = convertPNGDataURLToUint8Array(response);
 
       expect(
@@ -215,59 +215,73 @@ describe("ImageService", () => {
       const parent1SignedHash = new Uint8Array([8, 9]);
       const parent2SignedHash = new Uint8Array([10, 11]);
       const parentMarriageHash = new Uint8Array([12, 13]);
+      const signedMarriageId = new Uint8Array([13, 14]);
+      const signedApprovalHash = new Uint8Array([15, 16]);
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_gene",
+        METADATA.GENE,
         JSON.stringify(gene)
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_signedHash",
+        METADATA.SIGNED_HASH,
         signedHash
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_publicKey",
+        METADATA.PUBLIC_KEY,
         publicKey
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_parent1Gene",
+        METADATA.PARENT_1_GENE,
         JSON.stringify(parent1Gene)
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_parent2Gene",
+        METADATA.PARENT_2_GENE,
         JSON.stringify(parent2Gene)
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_parent2PublicKey",
+        METADATA.PARENT_2_PUBLIC_KEY,
         parent2PublicKey
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_parent1SignedHash",
+        METADATA.PARENT_1_SIGNED_HASH,
         parent1SignedHash
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_parent2SignedHash",
+        METADATA.PARENT_2_SIGNED_HASH,
         parent2SignedHash
       );
 
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
-        "pawgenics_parentMarriageHash",
+        METADATA.PARENT_MARRIAGE_HASH,
         parentMarriageHash
+      );
+
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.SIGNED_MARRIAGE_ID,
+        signedMarriageId
+      );
+
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.SIGNED_APPROVAL_HASH,
+        signedApprovalHash
       );
 
       const actualDog = ImageService.buildDogFromDataURL(dataURL);
@@ -280,7 +294,9 @@ describe("ImageService", () => {
         parent2PublicKey,
         parent1SignedHash,
         parent2SignedHash,
-        parentMarriageHash
+        parentMarriageHash,
+        signedMarriageId,
+        signedApprovalHash
       );
 
       expect(actualDog).toStrictEqual(expectedDog);

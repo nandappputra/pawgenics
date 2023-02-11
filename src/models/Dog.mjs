@@ -15,7 +15,9 @@ class Dog {
     parent2PublicKey = null,
     parent1SignedHash = null,
     parent2SignedHash = null,
-    parentMarriageHash = null
+    parentMarriageHash = null,
+    signedMarriageId = null,
+    signedApprovalHash = null
   ) {
     this.gene = gene;
     this.signedHash = signedHash;
@@ -26,6 +28,8 @@ class Dog {
     this.parent1SignedHash = parent1SignedHash;
     this.parent2SignedHash = parent2SignedHash;
     this.parentMarriageHash = parentMarriageHash;
+    this.signedMarriageId = signedMarriageId;
+    this.signedApprovalHash = signedApprovalHash;
   }
 
   static async buildDog(name, uuid) {
