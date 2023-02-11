@@ -8,7 +8,6 @@ const Adopt = () => {
 
   const generateDog = async () => {
     const [dog, key] = await GeneService.buildAdoptedDog();
-    console.log(dog);
     setAdoptedDog(dog);
     setPrivateKey(key);
   };

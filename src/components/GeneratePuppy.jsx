@@ -16,6 +16,7 @@ const GeneratePuppy = () => {
   const [approval, setApproval] = useState(null);
   const [key, setKey] = useState(null);
   const [puppy, setPuppy] = useState(null);
+  const [puppyKey, setPuppyKey] = useState(null);
 
   const receiveProposal = (image) => {
     const fileReader = new FileReader();
@@ -58,7 +59,7 @@ const GeneratePuppy = () => {
       secretKey
     );
     setPuppy(pup);
-    console.log(puppyKey);
+    setPuppyKey(puppyKey);
   };
 
   return (
@@ -113,7 +114,12 @@ const GeneratePuppy = () => {
         </div>
       )}
 
-      {puppy && <DogPicture dog={puppy} id="dogPup" />}
+      {puppy && (
+        <div>
+          <DogPicture dog={puppy} id="dogPup" />
+          <img src={puppyKey} />
+        </div>
+      )}
     </div>
   );
 };
