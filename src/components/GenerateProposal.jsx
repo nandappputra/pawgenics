@@ -55,11 +55,17 @@ const GenerateProposal = () => {
       {dog &&
         (key ? (
           <div>
-            <h3>Place your key here</h3>
             <img src={key} />
           </div>
         ) : (
-          <FileUploader handleChange={receiveKey} name="file" types={["PNG"]} />
+          <div>
+            <h3>Place your key here</h3>
+            <FileUploader
+              handleChange={receiveKey}
+              name="file"
+              types={["PNG"]}
+            />
+          </div>
         ))}
       {dog && key && (
         <div>
