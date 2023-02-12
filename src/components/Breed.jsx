@@ -33,15 +33,17 @@ const Breed = () => {
         content={<GeneratePuppy />}
       />
 
-      <h1 style={{ padding: "0.5em 0 0.5em 0" }} className="text-center">
-        Breeding
-      </h1>
-      <p className="text-center">
-        Combine your dog with other&apos;s and bring new pup!
-      </p>
       <Container>
         <Row>
-          <Col>
+          <h1 style={{ padding: "0.5em 0 0.5em 0" }} className="text-center">
+            Breeding
+          </h1>
+          <p className="text-center">
+            Combine your dog with other&apos;s and bring new pup!
+          </p>
+        </Row>
+        <Row className="justify-content-md-center text-center">
+          <Col md="auto">
             <Card
               style={{ width: "18rem", cursor: "pointer" }}
               onClick={() => setShownModal("proposal")}
@@ -57,7 +59,7 @@ const Breed = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col>
+          <Col md="auto">
             <Card
               style={{ width: "18rem", cursor: "pointer" }}
               onClick={() => setShownModal("approval")}
@@ -74,7 +76,7 @@ const Breed = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col>
+          <Col md="auto">
             <Card
               style={{ width: "18rem", cursor: "pointer" }}
               onClick={() => setShownModal("puppy")}
