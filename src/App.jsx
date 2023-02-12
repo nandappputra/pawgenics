@@ -14,6 +14,15 @@ const App = () => {
       <Navbar bg="light" sticky="top">
         <Container>
           <Navbar.Brand>
+            <img
+              src="./logo.svg"
+              width="30"
+              height="30"
+              className="d-inline-block align-top"
+              alt="React Bootstrap logo"
+            />
+          </Navbar.Brand>
+          <Navbar.Brand>
             <Link to="/" style={linkStyle}>
               Pawgenics
             </Link>

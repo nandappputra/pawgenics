@@ -1,4 +1,4 @@
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row, Button } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
 import { useState } from "react";
 
@@ -9,6 +9,10 @@ import GeneratePuppy from "./GeneratePuppy";
 
 const Breed = () => {
   const [shownModal, setShownModal] = useState("");
+
+  const getImageUrl = (name) => {
+    return new URL(`../assets/${name}.png`, import.meta.url).href;
+  };
 
   return (
     <div>
@@ -56,6 +60,13 @@ const Breed = () => {
                 <Card.Text className="text-center">
                   Let the world know that your dog is looking for a partner!
                 </Card.Text>
+                <img src={getImageUrl("propose")} style={{ width: "15rem" }} />
+                <Button
+                  onClick={() => setShownModal("proposal")}
+                  style={{ margin: "1em" }}
+                >
+                  Propose!
+                </Button>
               </Card.Body>
             </Card>
           </Col>
@@ -73,6 +84,13 @@ const Breed = () => {
                   Interested with another dog&apos;s offer? Approve the
                   proposal!
                 </Card.Text>
+                <img src={getImageUrl("approve")} style={{ width: "15rem" }} />
+                <Button
+                  onClick={() => setShownModal("approval")}
+                  style={{ margin: "1em" }}
+                >
+                  Approve!
+                </Button>
               </Card.Body>
             </Card>
           </Col>
@@ -90,6 +108,13 @@ const Breed = () => {
                   Bring new puppies to the world after you receive their
                   approval!
                 </Card.Text>
+                <img src={getImageUrl("puppy")} style={{ width: "15rem" }} />
+                <Button
+                  onClick={() => setShownModal("puppy")}
+                  style={{ margin: "1em" }}
+                >
+                  Puppy!
+                </Button>
               </Card.Body>
             </Card>
           </Col>

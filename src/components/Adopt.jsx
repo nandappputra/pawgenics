@@ -13,6 +13,10 @@ const Adopt = () => {
     setPrivateKey(key);
   };
 
+  const getImageUrl = (name) => {
+    return new URL(`../assets/${name}.png`, import.meta.url).href;
+  };
+
   return (
     <Container>
       <h1 style={{ padding: "0.5em 0 0.5em 0" }} className="text-center">
@@ -30,7 +34,11 @@ const Adopt = () => {
               <Card.Text className="text-center">
                 There might be a good dog waiting for you!
               </Card.Text>
-              <Button onClick={generateDog}>Adopt a dog!</Button>
+              <img src={getImageUrl("map")} style={{ width: "15rem" }} />
+
+              <Button onClick={generateDog} style={{ margin: "1em" }}>
+                Adopt a dog!
+              </Button>
             </Card.Body>
           </Card>
         </Col>
