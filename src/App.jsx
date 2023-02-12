@@ -13,13 +13,12 @@ const App = () => {
     return (
       <Navbar bg="light" sticky="top">
         <Container>
-          <Navbar.Brand>Pawgenics</Navbar.Brand>
+          <Navbar.Brand>
+            <Link to="/" style={linkStyle}>
+              Pawgenics
+            </Link>
+          </Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Item style={padding}>
-              <Link to="/" style={linkStyle}>
-                Home
-              </Link>
-            </Nav.Item>
             <Nav.Item style={padding}>
               <Link to="/adopt" style={linkStyle}>
                 Adopt

@@ -25,8 +25,11 @@ const Adopt = () => {
             <Card.Body className="justify-content-md-center">
               <Card.Title className="text-center">Look Around</Card.Title>
               <Card.Subtitle className="mb-2 text-muted">
-                There might be a good dog waiting for you!
+                Find nearby puppies
               </Card.Subtitle>
+              <Card.Text className="text-center">
+                There might be a good dog waiting for you!
+              </Card.Text>
               <Button onClick={generateDog}>Adopt a dog!</Button>
             </Card.Body>
           </Card>
