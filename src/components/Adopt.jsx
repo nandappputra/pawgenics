@@ -2,15 +2,18 @@ import React, { useState } from "react";
 import DogPicture from "./DogPicture.jsx";
 import GeneService from "../services/GeneService.mjs";
 import { Button, Container, Row, Col, Card } from "react-bootstrap";
+import DisplayInModal from "./DisplayInModal.jsx";
 
 const Adopt = () => {
   const [adoptedDog, setAdoptedDog] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
+  const [showNearbyDog, setShowNearbyDog] = useState(false);
 
   const generateDog = async () => {
     const [dog, key] = await GeneService.buildAdoptedDog();
     setAdoptedDog(dog);
     setPrivateKey(key);
+    setShowNearbyDog(true);
   };
 
   const getImageUrl = (name) => {
@@ -19,13 +22,27 @@ const Adopt = () => {
 
   return (
     <Container>
+      <DisplayInModal
+        show={showNearbyDog}
+        onHide={() => setShowNearbyDog(false)}
+        title="Dog found!"
+        content={
+          <div>
+            {adoptedDog && <DogPicture dog={adoptedDog} id="dogNew" />}
+            {privateKey && <img id="key" src={privateKey} />}
+          </div>
+        }
+      />
       <h1 style={{ padding: "0.5em 0 0.5em 0" }} className="text-center">
         Adopt
       </h1>
       <p className="text-center">Adopt a new dog!</p>
       <Row className="justify-content-md-center text-center">
         <Col md="auto">
-          <Card style={{ width: "18rem", cursor: "pointer" }}>
+          <Card
+            style={{ width: "18rem", cursor: "pointer" }}
+            onClick={generateDog}
+          >
             <Card.Body className="justify-content-md-center">
               <Card.Title className="text-center">Look Around</Card.Title>
               <Card.Subtitle className="mb-2 text-muted">
@@ -43,9 +60,6 @@ const Adopt = () => {
           </Card>
         </Col>
       </Row>
-
-      {adoptedDog && <DogPicture dog={adoptedDog} id="dogNew" />}
-      {privateKey && <img id="key" src={privateKey} />}
     </Container>
   );
 };
