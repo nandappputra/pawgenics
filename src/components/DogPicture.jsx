@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { fabric } from "fabric";
 import partProperties from "../assets/partConfiguration";
 import ImageService from "../services/ImageService.mjs";
+import { Button, Col, Container, Row } from "react-bootstrap";
 
 const DogPicture = ({ dog, id }) => {
   const CANVAS_WITDH = 300;
@@ -118,18 +119,28 @@ const DogPicture = ({ dog, id }) => {
   };
 
   return (
-    <div>
-      <canvas
-        width="300"
-        height="300"
-        id={id}
-        style={{
-          borderRadius: "1em",
-          border: "3px solid black",
-        }}
-      />
-      <button onClick={handleDownload}>download</button>
-    </div>
+    <Container>
+      <Row className="justify-content-md-center">
+        <Col md="auto">
+          <canvas
+            width="300"
+            height="300"
+            id={id}
+            style={{
+              borderRadius: "1em",
+              border: "3px solid black",
+            }}
+          />
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col md="auto">
+          <Button onClick={handleDownload} style={{ margin: "1em" }}>
+            download
+          </Button>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
