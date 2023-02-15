@@ -1,6 +1,6 @@
 import { Col, Container, Row, Button } from "react-bootstrap";
 
-const DownloadabePNG = (props) => {
+const DownloadablePNG = (props) => {
   const handleDownload = () => {
     const link = document.createElement("a");
     link.download = "image.png";
@@ -28,4 +28,4 @@ const DownloadabePNG = (props) => {
   );
 };
 
-export default DownloadabePNG;
+export default DownloadablePNG;

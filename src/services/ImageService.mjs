@@ -223,7 +223,7 @@ const isValidDogPNG = (dataURL) => {
   }
 };
 
-const generateProposalPNG = (dataURL, secretKey, marriageId) => {
+const generateProposalPNG = async (dataURL, secretKey, marriageId) => {
   const signedMarriageId = nacl.sign(marriageId, secretKey);
 
   dataURL = addMetadataFromBase64DataURL(
@@ -232,10 +232,13 @@ const generateProposalPNG = (dataURL, secretKey, marriageId) => {
     signedMarriageId
   );
 
-  return dataURL;
+  const proposalSymbol = new URL(`../assets/proposal.svg`, import.meta.url)
+    .href;
+
+  return await applySymbolToPNG(dataURL, proposalSymbol);
 };
 
-const generateApprovalPNG = (
+const generateApprovalPNG = async (
   proposerDataURL,
   approverDataURL,
   approverSecretKeyDataURL
@@ -274,7 +277,10 @@ const generateApprovalPNG = (
     signedApprovalHash
   );
 
-  return dataURL;
+  const approvalSymbol = new URL(`../assets/approval.svg`, import.meta.url)
+    .href;
+
+  return await applySymbolToPNG(dataURL, approvalSymbol);
 };
 
 const generatePrivateKeyDataPNG = async (secretKey) => {
@@ -302,6 +308,40 @@ const constructKeyDataUrl = (url) => {
 const convertMetadataToUInt8Array = (metadata) => {
   const array = metadata.split(",").map((element) => parseInt(element));
   return new Uint8Array(array);
+};
+
+const applySymbolToPNG = async (dogDataURL, symbolDataURL) => {
+  const canvas = new fabric.Canvas();
+  canvas.width = 300;
+  canvas.height = 300;
+  await loadImageToCanvas(canvas, dogDataURL);
+  await loadSymbolToCanvas(canvas, symbolDataURL);
+
+  return canvas.toDataURL();
+};
+
+const loadImageToCanvas = async (canvas, imageURL) => {
+  return new Promise((resolve) => {
+    fabric.Image.fromURL(imageURL, (image) => {
+      canvas.add(image);
+      image.center();
+      resolve(canvas);
+    });
+  });
+};
+
+const loadSymbolToCanvas = async (canvas, symbolURL) => {
+  return new Promise((resolve) => {
+    fabric.loadSVGFromURL(symbolURL, (results, options) => {
+      const groupSVG = fabric.util.groupSVGElements(results, options);
+      groupSVG.set({ originX: "center", originY: "center" });
+      groupSVG.set({ top: 265, left: 150 });
+      canvas.add(groupSVG);
+      canvas.renderAll();
+
+      resolve(groupSVG);
+    });
+  });
 };
 
 const ImageService = {

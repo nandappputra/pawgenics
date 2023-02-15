@@ -3,7 +3,7 @@ import DogPicture from "./DogPicture.jsx";
 import GeneService from "../services/GeneService.mjs";
 import { Button, Container, Row, Col, Card } from "react-bootstrap";
 import DisplayInModal from "./DisplayInModal.jsx";
-import DownloadabePNG from "./DownloadabePNG.jsx";
+import DownloadablePNG from "./DownloadablePNG.jsx";
 
 const Adopt = () => {
   const [adoptedDog, setAdoptedDog] = useState(null);
@@ -30,7 +30,7 @@ const Adopt = () => {
         content={
           <div>
             {adoptedDog && <DogPicture dog={adoptedDog} id="dogNew" />}
-            {privateKey && <DownloadabePNG imageDataURL={privateKey} />}
+            {privateKey && <DownloadablePNG imageDataURL={privateKey} />}
           </div>
         }
       />

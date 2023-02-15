@@ -11,6 +11,7 @@ import {
   convertMetadataStringToUint8Array,
   getMetadataFromUint8Array,
 } from "../utils/ImageUtil.mjs";
+import DownloadalbePNG from "./DownloadablePNG.jsx";
 
 const GenerateProposal = () => {
   const [dog, setDog] = useState(null);
@@ -33,7 +34,7 @@ const GenerateProposal = () => {
     fileReader.readAsDataURL(image);
   };
 
-  const generateProposalImage = () => {
+  const generateProposalImage = async () => {
     const keyUint8Array = convertPNGDataURLToUint8Array(key);
     const secretKeyString = getMetadataFromUint8Array(
       keyUint8Array,
@@ -43,7 +44,7 @@ const GenerateProposal = () => {
     const secretKey = convertMetadataStringToUint8Array(secretKeyString);
     const encoder = new TextEncoder();
     const uuid = encoder.encode(uuidv4());
-    setProposal(ImageService.generateProposalPNG(dog, secretKey, uuid));
+    setProposal(await ImageService.generateProposalPNG(dog, secretKey, uuid));
   };
 
   const style = { padding: "0.75em" };
@@ -96,7 +97,7 @@ const GenerateProposal = () => {
         <div>
           <h3>Your proposal is ready!</h3>
           <p>Save and share them with the world!</p>
-          <img src={proposal} style={{ borderRadius: "10%" }} />
+          <DownloadalbePNG imageDataURL={proposal} />
         </div>
       )}
     </Container>

@@ -170,7 +170,7 @@ describe("ImageService", () => {
         nacl.sign(uuid, parent1Key)
       );
 
-      const response = ImageService.generateApprovalPNG(
+      const response = await ImageService.generateApprovalPNG(
         parent1DataURL,
         parent2DataURL,
         key2
@@ -189,7 +189,7 @@ describe("ImageService", () => {
       const randomUuid = uuidParse(uuidv4());
       const keyPair = nacl.sign.keyPair();
 
-      const response = ImageService.generateProposalPNG(
+      const response = await ImageService.generateProposalPNG(
         dataURL,
         keyPair.secretKey,
         randomUuid

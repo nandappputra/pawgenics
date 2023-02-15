@@ -3,6 +3,7 @@ import { Container, Button } from "react-bootstrap";
 import { FileUploader } from "react-drag-drop-files";
 
 import ImageService from "../services/ImageService.mjs";
+import DownloadalbePNG from "./DownloadablePNG.jsx";
 
 const GenerateApproval = () => {
   const [proposal, setProposal] = useState(null);
@@ -34,8 +35,8 @@ const GenerateApproval = () => {
     fileReader.readAsDataURL(image);
   };
 
-  const generateApprovalImage = () => {
-    setApproval(ImageService.generateApprovalPNG(proposal, dog, key));
+  const generateApprovalImage = async () => {
+    setApproval(await ImageService.generateApprovalPNG(proposal, dog, key));
   };
 
   const style = { padding: "0.75em" };
@@ -101,7 +102,7 @@ const GenerateApproval = () => {
         <div>
           <h3>Your approval is ready!</h3>
           <p>Save and share your approval to the original proposer!</p>
-          <img src={approval} />
+          <DownloadalbePNG imageDataURL={approval} />
         </div>
       )}
     </Container>
