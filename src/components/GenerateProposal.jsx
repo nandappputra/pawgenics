@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Container } from "react-bootstrap";
 import { FileUploader } from "react-drag-drop-files";
-import { v4 as uuidv4 } from "uuid";
 import { Button } from "react-bootstrap";
 
 import ImageService from "../services/ImageService.mjs";
@@ -35,16 +34,24 @@ const GenerateProposal = () => {
   };
 
   const generateProposalImage = async () => {
+    const dogUint8Array = convertPNGDataURLToUint8Array(dog);
     const keyUint8Array = convertPNGDataURLToUint8Array(key);
+
+    const signedHashString = getMetadataFromUint8Array(
+      dogUint8Array,
+      METADATA.SIGNED_HASH
+    );
     const secretKeyString = getMetadataFromUint8Array(
       keyUint8Array,
       METADATA.SECRET_KEY
     );
 
+    const signedHash = convertMetadataStringToUint8Array(signedHashString);
     const secretKey = convertMetadataStringToUint8Array(secretKeyString);
-    const encoder = new TextEncoder();
-    const uuid = encoder.encode(uuidv4());
-    setProposal(await ImageService.generateProposalPNG(dog, secretKey, uuid));
+
+    setProposal(
+      await ImageService.generateProposalPNG(dog, secretKey, signedHash)
+    );
   };
 
   const style = { padding: "0.75em" };
