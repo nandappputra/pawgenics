@@ -149,10 +149,12 @@ describe("GeneService", () => {
       const [proposerDog, approverDog, secretKey] =
         await buildProposerApproverAndSecretKey();
 
+      const childKeyPair = nacl.sign.keyPair();
       const generatedDog = await GeneService.buildDogFromMarriage(
         proposerDog,
         approverDog,
-        secretKey
+        secretKey,
+        childKeyPair
       );
 
       ValidatorService.validateDogAuthenticity(generatedDog[0]);
@@ -162,10 +164,12 @@ describe("GeneService", () => {
       const [proposerDog, approverDog, secretKey] =
         await buildProposerApproverAndSecretKey();
 
+      const childKeyPair = nacl.sign.keyPair();
       const generatedDog = await GeneService.buildDogFromMarriage(
         proposerDog,
         approverDog,
-        secretKey
+        secretKey,
+        childKeyPair
       );
 
       const pngUint8Array = convertPNGDataURLToUint8Array(generatedDog[1]);
@@ -194,7 +198,7 @@ describe("GeneService", () => {
       proposer[0],
       canvas
     );
-    const proposal = ImageService.generateProposalPNG(
+    const proposal = await ImageService.generateProposalPNG(
       proposerDataURL,
       secretKey,
       uuid
@@ -204,7 +208,7 @@ describe("GeneService", () => {
       approver[0],
       canvas
     );
-    const approval = ImageService.generateApprovalPNG(
+    const approval = await ImageService.generateApprovalPNG(
       proposal,
       approverDataURL,
       approver[1]

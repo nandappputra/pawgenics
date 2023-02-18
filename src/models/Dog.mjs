@@ -12,6 +12,7 @@ class Dog {
     publicKey = null,
     parent1Gene = null,
     parent2Gene = null,
+    parent1PublicKey = null,
     parent2PublicKey = null,
     parent1SignedHash = null,
     parent2SignedHash = null,
@@ -24,6 +25,7 @@ class Dog {
     this.publicKey = publicKey;
     this.parent1Gene = parent1Gene;
     this.parent2Gene = parent2Gene;
+    this.parent1PublicKey = parent1PublicKey;
     this.parent2PublicKey = parent2PublicKey;
     this.parent1SignedHash = parent1SignedHash;
     this.parent2SignedHash = parent2SignedHash;

@@ -11,6 +11,7 @@ import GeneService from "../services/GeneService.mjs";
 import ImageService from "../services/ImageService.mjs";
 import DogPicture from "../components/DogPicture";
 import { Button, Container } from "react-bootstrap";
+import nacl from "tweetnacl";
 
 const GeneratePuppy = () => {
   const [proposal, setProposal] = useState(null);
@@ -54,10 +55,13 @@ const GeneratePuppy = () => {
     );
     const secretKey = convertMetadataStringToUint8Array(secretKeyString);
 
+    const childKeyPair = nacl.sign.keyPair();
+
     const [pup, puppyKey] = await GeneService.buildDogFromMarriage(
       proposerDog,
       approverDog,
-      secretKey
+      secretKey,
+      childKeyPair
     );
     setPuppy(pup);
     setPuppyKey(puppyKey);

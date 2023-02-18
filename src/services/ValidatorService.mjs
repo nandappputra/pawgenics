@@ -2,14 +2,27 @@ import {
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
 } from "../utils/ImageUtil.mjs";
-import { METADATA } from "../utils/constants.mjs";
 import nacl from "tweetnacl";
 import GeneService from "./GeneService.mjs";
+import { appendHash } from "../utils/GeneUtil.mjs";
 
 const validateMetadataPresence = (dataURL) => {
   const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
 
-  Object.values(METADATA).every((key) => {
+  const keysToCheck = [
+    "pawgenics_gene",
+    "pawgenics_signedHash",
+    "pawgenics_publicKey",
+    "pawgenics_parent1Gene",
+    "pawgenics_parent2Gene",
+    "pawgenics_parent1PublicKey",
+    "pawgenics_parent2PublicKey",
+    "pawgenics_parent1SignedHash",
+    "pawgenics_parent2SignedHash",
+    "pawgenics_parentMarriageHash",
+  ];
+
+  keysToCheck.every((key) => {
     if (getMetadataFromUint8Array(pngUint8Array, key) === undefined) {
       throw `missing ${key}`;
     }
@@ -19,15 +32,6 @@ const validateMetadataPresence = (dataURL) => {
 };
 
 const validateDogAuthenticity = (dog) => {
-  const parent1Hash = nacl.sign.open(dog.parent1SignedHash, dog.publicKey);
-  const parent2Hash = nacl.sign.open(
-    dog.parent2SignedHash,
-    dog.parent2PublicKey
-  );
-  if (parent1Hash === null || parent2Hash === null) {
-    throw "invalid parent hash";
-  }
-
   const marriageHash = nacl.sign.open(
     dog.parentMarriageHash,
     dog.parent2PublicKey
@@ -36,18 +40,20 @@ const validateDogAuthenticity = (dog) => {
     throw "invalid marriage id";
   }
 
-  const dogHash = nacl.sign.open(dog.signedHash, dog.publicKey);
+  const dogHash = nacl.sign.open(dog.signedHash, dog.parent1PublicKey);
   if (dogHash === null) {
     throw "invalid hash";
   }
 
   const generatedHash = GeneService.generateDogHashFromParents(
     marriageHash,
-    parent1Hash,
-    parent2Hash
+    dog.parent1SignedHash,
+    dog.parent2SignedHash
   );
 
-  if (!equalArrays(generatedHash, dogHash)) {
+  const finalHash = nacl.hash(appendHash([generatedHash, dog.publicKey]));
+
+  if (!equalArrays(finalHash, dogHash)) {
     throw "hash doesn't match";
   }
 };

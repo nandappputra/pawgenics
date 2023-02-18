@@ -17,6 +17,7 @@ describe("ValidatorService", () => {
       const publicKey = new Uint8Array([4, 5]);
       const parent1Gene = { parent1: "hi" };
       const parent2Gene = { parent2: "hi" };
+      const parent1PublicKey = new Uint8Array([7, 6]);
       const parent2PublicKey = new Uint8Array([6, 7]);
       const parent1SignedHash = new Uint8Array([8, 9]);
       const parent2SignedHash = new Uint8Array([10, 11]);
@@ -50,6 +51,12 @@ describe("ValidatorService", () => {
         dataURL,
         "pawgenics_parent2Gene",
         JSON.stringify(parent2Gene)
+      );
+
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        "pawgenics_parent1PublicKey",
+        parent1PublicKey
       );
 
       dataURL = addMetadataFromBase64DataURL(
@@ -97,34 +104,6 @@ describe("ValidatorService", () => {
   });
 
   describe("validateDogAuthenticity", () => {
-    test("should throw an error when one of the parent hashes cannot be verified", async () => {
-      const keyPair1 = nacl.sign.keyPair();
-      const keyPair2 = nacl.sign.keyPair();
-
-      const textEncoder = new TextEncoder();
-
-      const message = textEncoder.encode("test dna");
-      const mockParent1Hash = nacl.sign(message, keyPair1.secretKey);
-      const mockParent2Hash = nacl.sign(message, keyPair2.secretKey);
-      const faultyPublicKey = keyPair1.publicKey;
-
-      const dog = new Dog(
-        BLANK,
-        BLANK,
-        keyPair1.publicKey,
-        BLANK,
-        BLANK,
-        faultyPublicKey,
-        mockParent1Hash,
-        mockParent2Hash,
-        BLANK
-      );
-
-      expect(() => {
-        ValidatorService.validateDogAuthenticity(dog);
-      }).toThrow("invalid parent hash");
-    });
-
     test("should throw an error when the marriage id cannot be opened with parent 2 public key", async () => {
       const keyPair1 = nacl.sign.keyPair();
       const keyPair2 = nacl.sign.keyPair();
@@ -143,6 +122,7 @@ describe("ValidatorService", () => {
         keyPair1.publicKey,
         BLANK,
         BLANK,
+        keyPair1.publicKey,
         keyPair2.publicKey,
         mockParent1Hash,
         mockParent2Hash,
@@ -176,6 +156,7 @@ describe("ValidatorService", () => {
         keyPair1.publicKey,
         BLANK,
         BLANK,
+        keyPair1.publicKey,
         keyPair2.publicKey,
         mockParent1Hash,
         mockParent2Hash,
@@ -206,6 +187,7 @@ describe("ValidatorService", () => {
         keyPair1.publicKey,
         BLANK,
         BLANK,
+        keyPair1.publicKey,
         keyPair2.publicKey,
         mockParent1Hash,
         mockParent2Hash,

@@ -19,6 +19,7 @@ const buildDogFromDataURL = (dataURL) => {
     publicKey = null,
     parent1Gene = null,
     parent2Gene = null,
+    parent1PublicKey = null,
     parent2PublicKey = null,
     parent1SignedHash = null,
     parent2SignedHash = null,
@@ -61,6 +62,14 @@ const buildDogFromDataURL = (dataURL) => {
   );
   if (parent2GeneMeta) {
     parent2Gene = JSON.parse(parent2GeneMeta);
+  }
+
+  const parent1PulicKeyMeta = getMetadataFromUint8Array(
+    pngArray,
+    METADATA.PARENT_1_PUBLIC_KEY
+  );
+  if (parent1PulicKeyMeta) {
+    parent1PublicKey = convertMetadataStringToUint8Array(parent1PulicKeyMeta);
   }
 
   const parent2PulicKeyMeta = getMetadataFromUint8Array(
@@ -125,6 +134,7 @@ const buildDogFromDataURL = (dataURL) => {
     publicKey,
     parent1Gene,
     parent2Gene,
+    parent1PublicKey,
     parent2PublicKey,
     parent1SignedHash,
     parent2SignedHash,
@@ -164,6 +174,11 @@ const generateDogPNGWithMetadata = (dog, canvas) => {
   );
   dataURL = addMetadataFromBase64DataURL(
     dataURL,
+    METADATA.PARENT_1_PUBLIC_KEY,
+    dog.parent1PublicKey
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
     METADATA.PARENT_2_PUBLIC_KEY,
     dog.parent2PublicKey
   );
@@ -181,6 +196,16 @@ const generateDogPNGWithMetadata = (dog, canvas) => {
     dataURL,
     METADATA.PARENT_MARRIAGE_HASH,
     dog.parentMarriageHash
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.SIGNED_MARRIAGE_ID,
+    dog.signedMarriageId
+  );
+  dataURL = addMetadataFromBase64DataURL(
+    dataURL,
+    METADATA.SIGNED_APPROVAL_HASH,
+    dog.signedApprovalHash
   );
 
   return dataURL;
@@ -232,7 +257,7 @@ const generateProposalPNG = async (dataURL, secretKey, marriageId) => {
     signedMarriageId
   );
 
-  const proposalSymbol = new URL(`../assets/proposal.svg`, import.meta.url)
+  const proposalSymbol = new URL("../assets/proposal.svg", import.meta.url)
     .href;
 
   return await applySymbolToPNG(dataURL, proposalSymbol);
@@ -270,14 +295,13 @@ const generateApprovalPNG = async (
     approverPublicKey
   );
   const signedApprovalHash = nacl.sign(appendedHash, approverSecretKey);
-
   const dataURL = addMetadataFromBase64DataURL(
     approverDataURL,
     METADATA.SIGNED_APPROVAL_HASH,
     signedApprovalHash
   );
 
-  const approvalSymbol = new URL(`../assets/approval.svg`, import.meta.url)
+  const approvalSymbol = new URL("../assets/approval.svg", import.meta.url)
     .href;
 
   return await applySymbolToPNG(dataURL, approvalSymbol);
@@ -317,7 +341,9 @@ const applySymbolToPNG = async (dogDataURL, symbolDataURL) => {
   await loadImageToCanvas(canvas, dogDataURL);
   await loadSymbolToCanvas(canvas, symbolDataURL);
 
-  return canvas.toDataURL();
+  const dog = buildDogFromDataURL(dogDataURL);
+
+  return generateDogPNGWithMetadata(dog, canvas);
 };
 
 const loadImageToCanvas = async (canvas, imageURL) => {

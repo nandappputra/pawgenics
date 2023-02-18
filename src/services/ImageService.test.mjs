@@ -150,6 +150,7 @@ describe("ImageService", () => {
         parent1,
         canvas
       );
+
       const parent2DataURL = ImageService.generateDogPNGWithMetadata(
         parent2,
         canvas
@@ -184,7 +185,7 @@ describe("ImageService", () => {
   });
 
   describe("generateProposalPNG", () => {
-    test("should return a PNG with hashed approval", async () => {
+    test("should return a PNG with hashed proposal", async () => {
       const dataURL = generateDataURLWithoutMetadata();
       const randomUuid = uuidParse(uuidv4());
       const keyPair = nacl.sign.keyPair();
@@ -211,6 +212,7 @@ describe("ImageService", () => {
       const publicKey = new Uint8Array([4, 5]);
       const parent1Gene = { parent1: "hi" };
       const parent2Gene = { parent2: "hi" };
+      const parent1PublicKey = new Uint8Array([7, 6]);
       const parent2PublicKey = new Uint8Array([6, 7]);
       const parent1SignedHash = new Uint8Array([8, 9]);
       const parent2SignedHash = new Uint8Array([10, 11]);
@@ -246,6 +248,12 @@ describe("ImageService", () => {
         dataURL,
         METADATA.PARENT_2_GENE,
         JSON.stringify(parent2Gene)
+      );
+
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.PARENT_1_PUBLIC_KEY,
+        parent1PublicKey
       );
 
       dataURL = addMetadataFromBase64DataURL(
@@ -291,6 +299,7 @@ describe("ImageService", () => {
         publicKey,
         parent1Gene,
         parent2Gene,
+        parent1PublicKey,
         parent2PublicKey,
         parent1SignedHash,
         parent2SignedHash,
