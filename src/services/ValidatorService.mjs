@@ -88,6 +88,28 @@ const validateProposalAuthenticity = (dataURL) => {
   if (!equalArrays(actualSignedDogHash, signedDogHash)) {
     throw "signed dog hash doesn't match";
   }
+
+  const parent1PublicKeyString = getMetadataFromUint8Array(
+    dogPNGUint8Array,
+    METADATA.PARENT_1_PUBLIC_KEY
+  );
+  const parent1PublicKey = convertMetadataStringToUint8Array(
+    parent1PublicKeyString
+  );
+
+  const dogHash = nacl.sign.open(signedDogHash, parent1PublicKey);
+  const geneSeed = nacl.hash(appendHash([dogHash, publicKey]));
+  const gene = GeneService.buildDogGeneFromHash(geneSeed);
+  const geneString = JSON.stringify(gene);
+
+  const actualGeneString = getMetadataFromUint8Array(
+    dogPNGUint8Array,
+    METADATA.GENE
+  );
+
+  if (geneString !== actualGeneString) {
+    throw "gene doesn't match";
+  }
 };
 
 const equalArrays = (array1, array2) => {

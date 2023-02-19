@@ -5,6 +5,7 @@ import Dog from "../models/Dog.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
 import { addMetadataFromBase64DataURL } from "../utils/ImageUtil.mjs";
 import { METADATA } from "../utils/constants.mjs";
+import GeneService from "./GeneService.mjs";
 
 describe("ValidatorService", () => {
   const BLANK = null;
@@ -236,6 +237,53 @@ describe("ValidatorService", () => {
       expect(() => {
         ValidatorService.validateProposalAuthenticity(dataURL);
       }).toThrow("signed dog hash doesn't match");
+    });
+
+    test("should throw an error when dog hash doesn't match the actual one", async () => {
+      let dataURL = generateDataURLWithoutMetadata();
+      const parent1KeyPair = nacl.sign.keyPair();
+      const dogKeyPair = nacl.sign.keyPair();
+
+      const hash = nacl.randomBytes(64);
+      const signedDogHash = nacl.sign(hash, parent1KeyPair.secretKey);
+      const signedMarriageId = nacl.sign(signedDogHash, dogKeyPair.secretKey);
+
+      const faultyHash = nacl.randomBytes(64);
+      const faultyGeneSeed = nacl.hash(
+        appendHash([faultyHash, dogKeyPair.publicKey])
+      );
+      const faultyGene = GeneService.buildDogGeneFromHash(faultyGeneSeed);
+      const faultyGeneString = JSON.stringify(faultyGene);
+
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.SIGNED_HASH,
+        signedDogHash
+      );
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.SIGNED_MARRIAGE_ID,
+        signedMarriageId
+      );
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.PUBLIC_KEY,
+        dogKeyPair.publicKey
+      );
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.GENE,
+        faultyGeneString
+      );
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.PARENT_1_PUBLIC_KEY,
+        parent1KeyPair.publicKey
+      );
+
+      expect(() => {
+        ValidatorService.validateProposalAuthenticity(dataURL);
+      }).toThrow("gene doesn't match");
     });
   });
 
