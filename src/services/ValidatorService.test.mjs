@@ -4,6 +4,7 @@ import ValidatorService from "./ValidatorService.mjs";
 import Dog from "../models/Dog.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
 import { addMetadataFromBase64DataURL } from "../utils/ImageUtil.mjs";
+import { METADATA } from "../utils/constants.mjs";
 
 describe("ValidatorService", () => {
   const BLANK = null;
@@ -197,6 +198,44 @@ describe("ValidatorService", () => {
       expect(() => {
         ValidatorService.validateDogAuthenticity(dog);
       }).toThrow("hash doesn't match");
+    });
+  });
+
+  describe("validateProposalAuthenticity", () => {
+    test("should throw an error when the signed dog hash doesn't match the actual one", async () => {
+      let dataURL = generateDataURLWithoutMetadata();
+      const parent1KeyPair = nacl.sign.keyPair();
+      const dogKeyPair = nacl.sign.keyPair();
+
+      const hash = nacl.randomBytes(64);
+      const signedDogHash = nacl.sign(hash, parent1KeyPair.secretKey);
+      const signedMarriageId = nacl.sign(signedDogHash, dogKeyPair.secretKey);
+
+      const faultyHash = nacl.randomBytes(64);
+      const faultySignedDogHash = nacl.sign(
+        faultyHash,
+        parent1KeyPair.secretKey
+      );
+
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.SIGNED_HASH,
+        faultySignedDogHash
+      );
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.SIGNED_MARRIAGE_ID,
+        signedMarriageId
+      );
+      dataURL = addMetadataFromBase64DataURL(
+        dataURL,
+        METADATA.PUBLIC_KEY,
+        dogKeyPair.publicKey
+      );
+
+      expect(() => {
+        ValidatorService.validateProposalAuthenticity(dataURL);
+      }).toThrow("signed dog hash doesn't match");
     });
   });
 

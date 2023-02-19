@@ -1,10 +1,13 @@
 import {
+  convertMetadataStringToUint8Array,
   convertPNGDataURLToUint8Array,
   getMetadataFromUint8Array,
 } from "../utils/ImageUtil.mjs";
 import nacl from "tweetnacl";
 import GeneService from "./GeneService.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
+import ImageService from "./ImageService.mjs";
+import { METADATA } from "../utils/constants.mjs";
 
 const validateMetadataPresence = (dataURL) => {
   const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
@@ -58,6 +61,35 @@ const validateDogAuthenticity = (dog) => {
   }
 };
 
+const validateProposalAuthenticity = (dataURL) => {
+  const dogPNGUint8Array = convertPNGDataURLToUint8Array(dataURL);
+
+  const signedMarriageIdString = getMetadataFromUint8Array(
+    dogPNGUint8Array,
+    METADATA.SIGNED_MARRIAGE_ID
+  );
+  const marriageId = convertMetadataStringToUint8Array(signedMarriageIdString);
+
+  const publicKeyString = getMetadataFromUint8Array(
+    dogPNGUint8Array,
+    METADATA.PUBLIC_KEY
+  );
+  const publicKey = convertMetadataStringToUint8Array(publicKeyString);
+
+  const actualDogHashString = getMetadataFromUint8Array(
+    dogPNGUint8Array,
+    METADATA.SIGNED_HASH
+  );
+  const actualSignedDogHash =
+    convertMetadataStringToUint8Array(actualDogHashString);
+
+  const signedDogHash = nacl.sign.open(marriageId, publicKey);
+
+  if (!equalArrays(actualSignedDogHash, signedDogHash)) {
+    throw "signed dog hash doesn't match";
+  }
+};
+
 const equalArrays = (array1, array2) => {
   return (
     array1.length === array2.length &&
@@ -67,6 +99,10 @@ const equalArrays = (array1, array2) => {
   );
 };
 
-const ValidatorService = { validateMetadataPresence, validateDogAuthenticity };
+const ValidatorService = {
+  validateMetadataPresence,
+  validateDogAuthenticity,
+  validateProposalAuthenticity,
+};
 
 export default ValidatorService;
