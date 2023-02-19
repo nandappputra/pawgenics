@@ -6,7 +6,6 @@ import {
 import nacl from "tweetnacl";
 import GeneService from "./GeneService.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
-import ImageService from "./ImageService.mjs";
 import { METADATA } from "../utils/constants.mjs";
 
 const validateMetadataPresence = (dataURL) => {
@@ -69,7 +68,9 @@ const validateProposalAuthenticity = (dataURL) => {
     dogPNGUint8Array,
     METADATA.SIGNED_MARRIAGE_ID
   );
-  const marriageId = convertMetadataStringToUint8Array(signedMarriageIdString);
+  const signedMarriageId = convertMetadataStringToUint8Array(
+    signedMarriageIdString
+  );
 
   const publicKeyString = getMetadataFromUint8Array(
     dogPNGUint8Array,
@@ -84,7 +85,7 @@ const validateProposalAuthenticity = (dataURL) => {
   const actualSignedDogHash =
     convertMetadataStringToUint8Array(actualDogHashString);
 
-  const signedDogHash = nacl.sign.open(marriageId, publicKey);
+  const signedDogHash = nacl.sign.open(signedMarriageId, publicKey);
 
   if (!equalArrays(actualSignedDogHash, signedDogHash)) {
     throw "signed dog hash doesn't match";
@@ -113,6 +114,56 @@ const validateProposalAuthenticity = (dataURL) => {
   }
 };
 
+const validateApprovalAuthenticity = (proposalDataURL, approvalDataURL) => {
+  const proposalUint8Array = convertPNGDataURLToUint8Array(proposalDataURL);
+  const approvalUint8Array = convertPNGDataURLToUint8Array(approvalDataURL);
+
+  const signedMarriageIdString = getMetadataFromUint8Array(
+    proposalUint8Array,
+    METADATA.SIGNED_MARRIAGE_ID
+  );
+  const signedMarriageId = convertMetadataStringToUint8Array(
+    signedMarriageIdString
+  );
+  const proposerPublicKeyString = getMetadataFromUint8Array(
+    proposalUint8Array,
+    METADATA.PUBLIC_KEY
+  );
+  const proposerPublicKey = convertMetadataStringToUint8Array(
+    proposerPublicKeyString
+  );
+  const approverPublicKeyString = getMetadataFromUint8Array(
+    approvalUint8Array,
+    METADATA.PUBLIC_KEY
+  );
+  const approverPublicKey = convertMetadataStringToUint8Array(
+    approverPublicKeyString
+  );
+
+  const signedDogHash = nacl.sign.open(signedMarriageId, proposerPublicKey);
+  const marriageHash = GeneService.generateMarriageHash(
+    signedDogHash,
+    proposerPublicKey,
+    approverPublicKey
+  );
+
+  const actualSignedMarriageHashString = getMetadataFromUint8Array(
+    approvalUint8Array,
+    METADATA.SIGNED_APPROVAL_HASH
+  );
+  const actualSignedMarriageHash = convertMetadataStringToUint8Array(
+    actualSignedMarriageHashString
+  );
+  const actualMarriageHash = nacl.sign.open(
+    actualSignedMarriageHash,
+    approverPublicKey
+  );
+
+  if (!equalArrays(marriageHash, actualMarriageHash)) {
+    throw "marriage hash doesn't match";
+  }
+};
+
 const equalArrays = (array1, array2) => {
   return (
     array1.length === array2.length &&
@@ -126,6 +177,7 @@ const ValidatorService = {
   validateMetadataPresence,
   validateDogAuthenticity,
   validateProposalAuthenticity,
+  validateApprovalAuthenticity,
 };
 
 export default ValidatorService;

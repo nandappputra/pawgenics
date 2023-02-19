@@ -1,11 +1,19 @@
 import nacl from "tweetnacl";
+import { fabric } from "fabric";
+import { v4 as uuidv4 } from "uuid";
 
 import ValidatorService from "./ValidatorService.mjs";
 import Dog from "../models/Dog.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
-import { addMetadataFromBase64DataURL } from "../utils/ImageUtil.mjs";
+import {
+  addMetadataFromBase64DataURL,
+  convertMetadataStringToUint8Array,
+  convertPNGDataURLToUint8Array,
+  getMetadataFromUint8Array,
+} from "../utils/ImageUtil.mjs";
 import { METADATA } from "../utils/constants.mjs";
 import GeneService from "./GeneService.mjs";
+import ImageService from "./ImageService.mjs";
 
 describe("ValidatorService", () => {
   const BLANK = null;
@@ -287,7 +295,71 @@ describe("ValidatorService", () => {
     });
   });
 
+  describe("validateApprovalAuthenticity", () => {
+    test("should throw an error when the marriage hash doesn't match the actual one", async () => {
+      let [proposal, approval] = await buildProposalAndApproval();
+
+      const keyPair = nacl.sign.keyPair();
+      const faultyMarriageHash = nacl.sign(
+        nacl.randomBytes(64),
+        keyPair.secretKey
+      );
+
+      approval = addMetadataFromBase64DataURL(
+        approval,
+        METADATA.SIGNED_APPROVAL_HASH,
+        faultyMarriageHash
+      );
+      approval = addMetadataFromBase64DataURL(
+        approval,
+        METADATA.PUBLIC_KEY,
+        keyPair.publicKey
+      );
+
+      expect(() => {
+        ValidatorService.validateApprovalAuthenticity(proposal, approval);
+      }).toThrow("marriage hash doesn't match");
+    });
+  });
+
   const generateDataURLWithoutMetadata = () => {
     return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAAAxUlEQVR4nO3BMQEAAADCoPVPbQhfoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOA1v9QAATX68/0AAAAASUVORK5CYII=";
+  };
+
+  const buildProposalAndApproval = async () => {
+    const canvas = new fabric.Canvas();
+    const proposer = await GeneService.buildAdoptedDog();
+    const approver = await GeneService.buildAdoptedDog();
+
+    const keyUint8Array = convertPNGDataURLToUint8Array(proposer[1]);
+    const secretKeyString = getMetadataFromUint8Array(
+      keyUint8Array,
+      METADATA.SECRET_KEY
+    );
+    const secretKey = convertMetadataStringToUint8Array(secretKeyString);
+    const encoder = new TextEncoder();
+    const uuid = encoder.encode(uuidv4());
+
+    const proposerDataURL = ImageService.generateDogPNGWithMetadata(
+      proposer[0],
+      canvas
+    );
+    const proposal = await ImageService.generateProposalPNG(
+      proposerDataURL,
+      secretKey,
+      uuid
+    );
+
+    const approverDataURL = ImageService.generateDogPNGWithMetadata(
+      approver[0],
+      canvas
+    );
+    const approval = await ImageService.generateApprovalPNG(
+      proposal,
+      approverDataURL,
+      approver[1]
+    );
+
+    return [proposal, approval];
   };
 });
