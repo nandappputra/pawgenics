@@ -117,9 +117,9 @@ const buildAdoptedDog = async () => {
     parent2Hash
   );
   const finalHash = nacl.hash(appendHash([hash, dogKeyPair.publicKey]));
-  const signedHash = nacl.sign(finalHash, parent1KeyPair.secretKey);
+  const signedHash = nacl.sign(hash, parent1KeyPair.secretKey);
 
-  const gene = buildDogGeneFromHash(hash);
+  const gene = buildDogGeneFromHash(finalHash);
   const parent1Gene = buildDogGeneFromHash(parent1SignedHash);
   const parent2Gene = buildDogGeneFromHash(parent2SignedHash);
 
@@ -169,13 +169,13 @@ const buildDogFromMarriage = async (
     approverHash
   );
   const finalHash = nacl.hash(appendHash([hash, childKeyPair.publicKey]));
-  const signedHash = nacl.sign(finalHash, proposerSecretKey);
+  const signedHash = nacl.sign(hash, proposerSecretKey);
 
   const key = await ImageService.generatePrivateKeyDataPNG(proposerSecretKey);
 
   return [
     new Dog(
-      buildDogGeneFromHash(hash),
+      buildDogGeneFromHash(finalHash),
       signedHash,
       childKeyPair.publicKey,
       buildDogGeneFromHash(proposerHash),

@@ -47,6 +47,7 @@ const validateDogAuthenticity = (dog) => {
   if (dogHash === null) {
     throw "invalid hash";
   }
+  const geneSeed = nacl.hash(appendHash([dogHash, dog.publicKey]));
 
   const generatedHash = GeneService.generateDogHashFromParents(
     marriageHash,
@@ -56,7 +57,7 @@ const validateDogAuthenticity = (dog) => {
 
   const finalHash = nacl.hash(appendHash([generatedHash, dog.publicKey]));
 
-  if (!equalArrays(finalHash, dogHash)) {
+  if (!equalArrays(finalHash, geneSeed)) {
     throw "hash doesn't match";
   }
 };
