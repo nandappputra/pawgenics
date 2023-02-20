@@ -211,8 +211,47 @@ describe("ValidatorService", () => {
   });
 
   describe("validateProposalAuthenticity", () => {
+    test("should throw an error when the dog is not valid", async () => {
+      const canvas = new fabric.Canvas();
+      const keyPair1 = nacl.sign.keyPair();
+      const keyPair2 = nacl.sign.keyPair();
+
+      const textEncoder = new TextEncoder();
+
+      const message = textEncoder.encode("test dna");
+      const mockParent1Hash = nacl.sign(message, keyPair1.secretKey);
+      const mockParent2Hash = nacl.sign(message, keyPair2.secretKey);
+
+      const faultyMarriageId = nacl.sign(message, keyPair1.secretKey);
+
+      const dog = new Dog(
+        BLANK,
+        BLANK,
+        keyPair1.publicKey,
+        BLANK,
+        BLANK,
+        keyPair1.publicKey,
+        keyPair2.publicKey,
+        mockParent1Hash,
+        mockParent2Hash,
+        faultyMarriageId
+      );
+
+      const dataURL = await ImageService.generateDogPNGWithMetadata(
+        dog,
+        canvas
+      );
+
+      expect(() => {
+        ValidatorService.validateProposalAuthenticity(dataURL);
+      }).toThrow("invalid marriage id");
+    });
+
     test("should throw an error when the signed dog hash doesn't match the actual one", async () => {
-      let dataURL = generateDataURLWithoutMetadata();
+      const dog = await GeneService.buildAdoptedDog();
+      const canvas = new fabric.Canvas();
+
+      let dataURL = ImageService.generateDogPNGWithMetadata(dog[0], canvas);
       const parent1KeyPair = nacl.sign.keyPair();
       const dogKeyPair = nacl.sign.keyPair();
 
@@ -220,17 +259,6 @@ describe("ValidatorService", () => {
       const signedDogHash = nacl.sign(hash, parent1KeyPair.secretKey);
       const signedMarriageId = nacl.sign(signedDogHash, dogKeyPair.secretKey);
 
-      const faultyHash = nacl.randomBytes(64);
-      const faultySignedDogHash = nacl.sign(
-        faultyHash,
-        parent1KeyPair.secretKey
-      );
-
-      dataURL = addMetadataFromBase64DataURL(
-        dataURL,
-        METADATA.SIGNED_HASH,
-        faultySignedDogHash
-      );
       dataURL = addMetadataFromBase64DataURL(
         dataURL,
         METADATA.SIGNED_MARRIAGE_ID,
@@ -245,53 +273,6 @@ describe("ValidatorService", () => {
       expect(() => {
         ValidatorService.validateProposalAuthenticity(dataURL);
       }).toThrow("signed dog hash doesn't match");
-    });
-
-    test("should throw an error when dog hash doesn't match the actual one", async () => {
-      let dataURL = generateDataURLWithoutMetadata();
-      const parent1KeyPair = nacl.sign.keyPair();
-      const dogKeyPair = nacl.sign.keyPair();
-
-      const hash = nacl.randomBytes(64);
-      const signedDogHash = nacl.sign(hash, parent1KeyPair.secretKey);
-      const signedMarriageId = nacl.sign(signedDogHash, dogKeyPair.secretKey);
-
-      const faultyHash = nacl.randomBytes(64);
-      const faultyGeneSeed = nacl.hash(
-        appendHash([faultyHash, dogKeyPair.publicKey])
-      );
-      const faultyGene = GeneService.buildDogGeneFromHash(faultyGeneSeed);
-      const faultyGeneString = JSON.stringify(faultyGene);
-
-      dataURL = addMetadataFromBase64DataURL(
-        dataURL,
-        METADATA.SIGNED_HASH,
-        signedDogHash
-      );
-      dataURL = addMetadataFromBase64DataURL(
-        dataURL,
-        METADATA.SIGNED_MARRIAGE_ID,
-        signedMarriageId
-      );
-      dataURL = addMetadataFromBase64DataURL(
-        dataURL,
-        METADATA.PUBLIC_KEY,
-        dogKeyPair.publicKey
-      );
-      dataURL = addMetadataFromBase64DataURL(
-        dataURL,
-        METADATA.GENE,
-        faultyGeneString
-      );
-      dataURL = addMetadataFromBase64DataURL(
-        dataURL,
-        METADATA.PARENT_1_PUBLIC_KEY,
-        parent1KeyPair.publicKey
-      );
-
-      expect(() => {
-        ValidatorService.validateProposalAuthenticity(dataURL);
-      }).toThrow("gene doesn't match");
     });
   });
 

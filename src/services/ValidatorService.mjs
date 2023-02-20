@@ -7,6 +7,7 @@ import nacl from "tweetnacl";
 import GeneService from "./GeneService.mjs";
 import { appendHash } from "../utils/GeneUtil.mjs";
 import { METADATA } from "../utils/constants.mjs";
+import ImageService from "./ImageService.mjs";
 
 const validateMetadataPresence = (dataURL) => {
   const pngUint8Array = convertPNGDataURLToUint8Array(dataURL);
@@ -62,6 +63,9 @@ const validateDogAuthenticity = (dog) => {
 };
 
 const validateProposalAuthenticity = (dataURL) => {
+  const dog = ImageService.buildDogFromDataURL(dataURL);
+  validateDogAuthenticity(dog);
+
   const dogPNGUint8Array = convertPNGDataURLToUint8Array(dataURL);
 
   const signedMarriageIdString = getMetadataFromUint8Array(
@@ -89,28 +93,6 @@ const validateProposalAuthenticity = (dataURL) => {
 
   if (!equalArrays(actualSignedDogHash, signedDogHash)) {
     throw "signed dog hash doesn't match";
-  }
-
-  const parent1PublicKeyString = getMetadataFromUint8Array(
-    dogPNGUint8Array,
-    METADATA.PARENT_1_PUBLIC_KEY
-  );
-  const parent1PublicKey = convertMetadataStringToUint8Array(
-    parent1PublicKeyString
-  );
-
-  const dogHash = nacl.sign.open(signedDogHash, parent1PublicKey);
-  const geneSeed = nacl.hash(appendHash([dogHash, publicKey]));
-  const gene = GeneService.buildDogGeneFromHash(geneSeed);
-  const geneString = JSON.stringify(gene);
-
-  const actualGeneString = getMetadataFromUint8Array(
-    dogPNGUint8Array,
-    METADATA.GENE
-  );
-
-  if (geneString !== actualGeneString) {
-    throw "gene doesn't match";
   }
 };
 
