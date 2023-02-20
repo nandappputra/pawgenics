@@ -97,6 +97,12 @@ const validateProposalAuthenticity = (dataURL) => {
 };
 
 const validateApprovalAuthenticity = (proposalDataURL, approvalDataURL) => {
+  const proposerDog = ImageService.buildDogFromDataURL(proposalDataURL);
+  const approverDog = ImageService.buildDogFromDataURL(approvalDataURL);
+
+  validateDogAuthenticity(proposerDog);
+  validateDogAuthenticity(approverDog);
+
   const proposalUint8Array = convertPNGDataURLToUint8Array(proposalDataURL);
   const approvalUint8Array = convertPNGDataURLToUint8Array(approvalDataURL);
 

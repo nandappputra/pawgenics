@@ -277,6 +277,38 @@ describe("ValidatorService", () => {
   });
 
   describe("validateApprovalAuthenticity", () => {
+    test("should throw an error the proposer dog is not a valid dog", async () => {
+      let [proposal, approval] = await buildProposalAndApproval();
+
+      const keyPair = nacl.sign.keyPair();
+
+      proposal = addMetadataFromBase64DataURL(
+        proposal,
+        METADATA.PARENT_1_PUBLIC_KEY,
+        keyPair.publicKey
+      );
+
+      expect(() => {
+        ValidatorService.validateApprovalAuthenticity(proposal, approval);
+      }).toThrow("invalid hash");
+    });
+
+    test("should throw an error the approver dog is not a valid dog", async () => {
+      let [proposal, approval] = await buildProposalAndApproval();
+
+      const keyPair = nacl.sign.keyPair();
+
+      approval = addMetadataFromBase64DataURL(
+        approval,
+        METADATA.PARENT_1_PUBLIC_KEY,
+        keyPair.publicKey
+      );
+
+      expect(() => {
+        ValidatorService.validateApprovalAuthenticity(proposal, approval);
+      }).toThrow("invalid hash");
+    });
+
     test("should throw an error when the marriage hash doesn't match the actual one", async () => {
       let [proposal, approval] = await buildProposalAndApproval();
 
