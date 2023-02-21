@@ -264,18 +264,18 @@ const generateProposalPNG = async (dataURL, secretKey, marriageId) => {
 };
 
 const generateApprovalPNG = async (
-  proposerDataURL,
+  proposalDataURL,
   approverDataURL,
   approverSecretKeyDataURL
 ) => {
-  const proposerUint8Array = convertPNGDataURLToUint8Array(proposerDataURL);
+  const proposalUint8Array = convertPNGDataURLToUint8Array(proposalDataURL);
   const approverUint8Array = convertPNGDataURLToUint8Array(approverDataURL);
   const approverSecretUint8Array = convertPNGDataURLToUint8Array(
     approverSecretKeyDataURL
   );
 
   const proposerPublicKey = convertMetadataStringToUint8Array(
-    getMetadataFromUint8Array(proposerUint8Array, METADATA.PUBLIC_KEY)
+    getMetadataFromUint8Array(proposalUint8Array, METADATA.PUBLIC_KEY)
   );
   const approverPublicKey = convertMetadataStringToUint8Array(
     getMetadataFromUint8Array(approverUint8Array, METADATA.PUBLIC_KEY)
@@ -285,7 +285,7 @@ const generateApprovalPNG = async (
   );
 
   const signedMarriageId = convertMetadataToUInt8Array(
-    getMetadataFromUint8Array(proposerUint8Array, METADATA.SIGNED_MARRIAGE_ID)
+    getMetadataFromUint8Array(proposalUint8Array, METADATA.SIGNED_MARRIAGE_ID)
   );
   const marriageId = nacl.sign.open(signedMarriageId, proposerPublicKey);
 

@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import { v4 as uuidv4, parse as uuidParse } from "uuid";
 import nacl from "tweetnacl";
 
 import Dog from "../models/Dog.mjs";
@@ -141,52 +140,8 @@ describe("ImageService", () => {
     });
   });
 
-  describe("generateApprovalPNG", () => {
-    test("should return a PNG with hashed marriage ID", async () => {
-      const canvas = new fabric.Canvas();
-      const [parent1, key1] = await GeneService.buildAdoptedDog();
-      const [parent2, key2] = await GeneService.buildAdoptedDog();
-
-      let parent1DataURL = ImageService.generateDogPNGWithMetadata(
-        parent1,
-        canvas
-      );
-
-      const parent2DataURL = ImageService.generateDogPNGWithMetadata(
-        parent2,
-        canvas
-      );
-
-      const encoder = new TextEncoder();
-      const uuid = encoder.encode(uuidv4());
-      const parent1KeyUint8Array = convertPNGDataURLToUint8Array(key1);
-      const parent1KeyString = getMetadataFromUint8Array(
-        parent1KeyUint8Array,
-        "pawgenics_secretKey"
-      );
-
-      const parent1Key = convertMetadataStringToUint8Array(parent1KeyString);
-      parent1DataURL = addMetadataFromBase64DataURL(
-        parent1DataURL,
-        "pawgenics_signedMarriageId",
-        nacl.sign(uuid, parent1Key)
-      );
-
-      const response = await ImageService.generateApprovalPNG(
-        parent1DataURL,
-        parent2DataURL,
-        key2
-      );
-      const pngUint8Array = convertPNGDataURLToUint8Array(response);
-
-      expect(
-        getMetadataFromUint8Array(pngUint8Array, "pawgenics_signedApprovalHash")
-      ).toBeDefined();
-    });
-  });
-
   describe("generateProposalPNG", () => {
-    test.only("should return a valid proposal", async () => {
+    test("should return a valid proposal", async () => {
       const [dog, key] = await GeneService.buildAdoptedDog();
       const canvas = new fabric.Canvas();
       const dogDataURL = ImageService.generateDogPNGWithMetadata(dog, canvas);
@@ -205,6 +160,44 @@ describe("ImageService", () => {
       );
 
       ValidatorService.validateProposalAuthenticity(response);
+    });
+  });
+
+  describe("generateApprovalPNG", () => {
+    test("should return a PNG with hashed marriage ID", async () => {
+      const canvas = new fabric.Canvas();
+      const [parent1, key1] = await GeneService.buildAdoptedDog();
+      const [parent2, key2] = await GeneService.buildAdoptedDog();
+
+      let parent1DataURL = ImageService.generateDogPNGWithMetadata(
+        parent1,
+        canvas
+      );
+      const parent2DataURL = ImageService.generateDogPNGWithMetadata(
+        parent2,
+        canvas
+      );
+
+      const parent1KeyUint8Array = convertPNGDataURLToUint8Array(key1);
+      const parent1KeyString = getMetadataFromUint8Array(
+        parent1KeyUint8Array,
+        METADATA.SECRET_KEY
+      );
+      const parent1Key = convertMetadataStringToUint8Array(parent1KeyString);
+
+      const proposal = await ImageService.generateProposalPNG(
+        parent1DataURL,
+        parent1Key,
+        parent1.signedHash
+      );
+
+      const response = await ImageService.generateApprovalPNG(
+        proposal,
+        parent2DataURL,
+        key2
+      );
+
+      ValidatorService.validateApprovalAuthenticity(proposal, response);
     });
   });
 
