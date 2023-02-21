@@ -12,6 +12,7 @@ import {
 import ImageService from "./ImageService.mjs";
 import { METADATA } from "../utils/constants.mjs";
 import GeneService from "./GeneService.mjs";
+import ValidatorService from "./ValidatorService.mjs";
 
 describe("ImageService", () => {
   describe("generateDogPNGWithMetadata", () => {
@@ -185,21 +186,25 @@ describe("ImageService", () => {
   });
 
   describe("generateProposalPNG", () => {
-    test("should return a PNG with hashed proposal", async () => {
-      const dataURL = generateDataURLWithoutMetadata();
-      const randomUuid = uuidParse(uuidv4());
-      const keyPair = nacl.sign.keyPair();
+    test.only("should return a valid proposal", async () => {
+      const [dog, key] = await GeneService.buildAdoptedDog();
+      const canvas = new fabric.Canvas();
+      const dogDataURL = ImageService.generateDogPNGWithMetadata(dog, canvas);
+
+      const keyUint8Array = convertPNGDataURLToUint8Array(key);
+      const secretKeyString = getMetadataFromUint8Array(
+        keyUint8Array,
+        METADATA.SECRET_KEY
+      );
+      const secretKey = convertMetadataStringToUint8Array(secretKeyString);
 
       const response = await ImageService.generateProposalPNG(
-        dataURL,
-        keyPair.secretKey,
-        randomUuid
+        dogDataURL,
+        secretKey,
+        dog.signedHash
       );
-      const pngUint8Array = convertPNGDataURLToUint8Array(response);
 
-      expect(
-        getMetadataFromUint8Array(pngUint8Array, "pawgenics_signedMarriageId")
-      ).toBeDefined();
+      ValidatorService.validateProposalAuthenticity(response);
     });
   });
 
