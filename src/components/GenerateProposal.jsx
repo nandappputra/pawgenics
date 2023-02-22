@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Button, Alert } from "react-bootstrap";
 import { FileUploader } from "react-drag-drop-files";
-import { Button } from "react-bootstrap";
 
 import ImageService from "../services/ImageService.mjs";
 import { METADATA } from "../utils/constants.mjs";
@@ -11,16 +10,27 @@ import {
   getMetadataFromUint8Array,
 } from "../utils/ImageUtil.mjs";
 import DownloadalbePNG from "./DownloadablePNG.jsx";
+import ValidatorService from "../services/ValidatorService.mjs";
 
 const GenerateProposal = () => {
   const [dog, setDog] = useState(null);
   const [key, setKey] = useState(null);
+  const [alert, setAlert] = useState(null);
   const [proposal, setProposal] = useState(null);
 
   const receiveDog = (image) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      setDog(fileReader.result);
+      try {
+        ValidatorService.validateDogAuthenticity(
+          ImageService.buildDogFromDataURL(fileReader.result)
+        );
+        setDog(fileReader.result);
+        setAlert(null);
+      } catch (error) {
+        setAlert("Invalid dog!");
+        setTimeout(() => setAlert(null), 5000);
+      }
     };
     fileReader.readAsDataURL(image);
   };
@@ -60,6 +70,7 @@ const GenerateProposal = () => {
     <Container className="text-center">
       {proposal === null ? (
         <div>
+          {alert && <Alert variant="danger">{alert}</Alert>}
           <div style={style}>
             <h4>Place your dog here</h4>
             {dog ? (
