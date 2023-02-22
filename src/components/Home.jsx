@@ -1,4 +1,5 @@
-import { Col, Row, Container } from "react-bootstrap";
+import { Col, Row, Container, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -24,6 +25,13 @@ const Home = () => {
       <Row>
         <Col>
           <p className="text-center">Adopt & breed adorable digital puppies!</p>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col md="auto">
+          <Link to="/adopt">
+            <Button>Adopt Your Puppies!</Button>
+          </Link>
         </Col>
       </Row>
     </Container>
