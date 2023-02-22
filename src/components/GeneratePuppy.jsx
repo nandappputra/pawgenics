@@ -57,7 +57,13 @@ const GeneratePuppy = () => {
   const receiveKey = (image) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      setKey(fileReader.result);
+      try {
+        ValidatorService.validateKeyAuthenticity(proposal, fileReader.result);
+        setKey(fileReader.result);
+      } catch (error) {
+        setAlert("Invalid key!");
+        setTimeout(() => setAlert(null), 5000);
+      }
     };
     fileReader.readAsDataURL(image);
   };
