@@ -1,20 +1,28 @@
 import { useState } from "react";
-import { Container, Button } from "react-bootstrap";
+import { Container, Button, Alert } from "react-bootstrap";
 import { FileUploader } from "react-drag-drop-files";
 
 import ImageService from "../services/ImageService.mjs";
+import ValidatorService from "../services/ValidatorService.mjs";
 import DownloadalbePNG from "./DownloadablePNG.jsx";
 
 const GenerateApproval = () => {
   const [proposal, setProposal] = useState(null);
   const [dog, setDog] = useState(null);
   const [key, setKey] = useState(null);
+  const [alert, setAlert] = useState(null);
   const [approval, setApproval] = useState(null);
 
   const receiveProposal = (image) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      setProposal(fileReader.result);
+      try {
+        ValidatorService.validateProposalAuthenticity(fileReader.result);
+        setProposal(fileReader.result);
+      } catch (error) {
+        setAlert("Invalid proposal!");
+        setTimeout(() => setAlert(null), 5000);
+      }
     };
     fileReader.readAsDataURL(image);
   };
@@ -45,6 +53,7 @@ const GenerateApproval = () => {
     <Container className="text-center">
       {approval === null ? (
         <div>
+          {alert && <Alert variant="danger">{alert}</Alert>}
           <div style={style}>
             <h4>Place the proposal here</h4>
             {proposal ? (
