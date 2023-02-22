@@ -10,20 +10,29 @@ import { METADATA } from "../utils/constants.mjs";
 import GeneService from "../services/GeneService.mjs";
 import ImageService from "../services/ImageService.mjs";
 import DogPicture from "../components/DogPicture";
-import { Button, Container } from "react-bootstrap";
+import { Button, Container, Alert } from "react-bootstrap";
 import nacl from "tweetnacl";
+import ValidatorService from "../services/ValidatorService.mjs";
+import DownloadablePNG from "./DownloadablePNG.jsx";
 
 const GeneratePuppy = () => {
   const [proposal, setProposal] = useState(null);
   const [approval, setApproval] = useState(null);
   const [key, setKey] = useState(null);
   const [puppy, setPuppy] = useState(null);
+  const [alert, setAlert] = useState(null);
   const [puppyKey, setPuppyKey] = useState(null);
 
   const receiveProposal = (image) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      setProposal(fileReader.result);
+      try {
+        ValidatorService.validateProposalAuthenticity(fileReader.result);
+        setProposal(fileReader.result);
+      } catch (error) {
+        setAlert("Invalid proposal!");
+        setTimeout(() => setAlert(null), 5000);
+      }
     };
     fileReader.readAsDataURL(image);
   };
@@ -31,7 +40,16 @@ const GeneratePuppy = () => {
   const receiveApproval = (image) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      setApproval(fileReader.result);
+      try {
+        ValidatorService.validateApprovalAuthenticity(
+          proposal,
+          fileReader.result
+        );
+        setApproval(fileReader.result);
+      } catch (error) {
+        setAlert("Invalid approval!");
+        setTimeout(() => setAlert(null), 5000);
+      }
     };
     fileReader.readAsDataURL(image);
   };
@@ -71,6 +89,7 @@ const GeneratePuppy = () => {
     <Container className="text-center">
       {puppy === null ? (
         <div>
+          {alert && <Alert variant="danger">{alert}</Alert>}
           <div>
             <h4>Place the original proposal here</h4>
             {proposal ? (
@@ -133,7 +152,7 @@ const GeneratePuppy = () => {
       ) : (
         <div>
           <DogPicture dog={puppy} id="dogPup" />
-          <img src={puppyKey} />
+          <DownloadablePNG imageDataURL={puppyKey} />
         </div>
       )}
     </Container>
