@@ -335,6 +335,21 @@ describe("ValidatorService", () => {
     });
   });
 
+  describe("validateKeyAuthenticity", () => {
+    test("should throw an error when the key doesn't fit", async () => {
+      const dog1 = await GeneService.buildAdoptedDog();
+      const dog2 = await GeneService.buildAdoptedDog();
+      const canvas = new fabric.Canvas();
+
+      expect(() => {
+        ValidatorService.validateKeyAuthenticity(
+          ImageService.generateDogPNGWithMetadata(dog1[0], canvas),
+          dog2[1]
+        );
+      }).toThrow("invalid key");
+    });
+  });
+
   const generateDataURLWithoutMetadata = () => {
     return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAABmJLR0QA/wD/AP+gvaeTAAAAxUlEQVR4nO3BMQEAAADCoPVPbQhfoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOA1v9QAATX68/0AAAAASUVORK5CYII=";
   };

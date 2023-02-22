@@ -152,6 +152,26 @@ const validateApprovalAuthenticity = (proposalDataURL, approvalDataURL) => {
   }
 };
 
+const validateKeyAuthenticity = (dogDataURL, keyDataURL) => {
+  const keyUint8Array = convertPNGDataURLToUint8Array(keyDataURL);
+  const secretKeyString = getMetadataFromUint8Array(
+    keyUint8Array,
+    METADATA.SECRET_KEY
+  );
+  const secretKey = convertMetadataStringToUint8Array(secretKeyString);
+
+  const dog = ImageService.buildDogFromDataURL(dogDataURL);
+  const publicKey = dog.publicKey;
+
+  const testMessage = new Uint8Array([1, 2, 3]);
+  const signedMessage = nacl.sign(testMessage, secretKey);
+  const openedMessage = nacl.sign.open(signedMessage, publicKey);
+
+  if (openedMessage == null) {
+    throw "invalid key";
+  }
+};
+
 const equalArrays = (array1, array2) => {
   return (
     array1.length === array2.length &&
@@ -166,6 +186,7 @@ const ValidatorService = {
   validateDogAuthenticity,
   validateProposalAuthenticity,
   validateApprovalAuthenticity,
+  validateKeyAuthenticity,
 };
 
 export default ValidatorService;
