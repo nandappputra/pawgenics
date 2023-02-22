@@ -1,6 +1,17 @@
-# Application Name
+# Pawgenics
 
-Application description
+Pawgenics is a web browser game where you can adopt and breed your own digital puppies.
+
+When you adopt a puppy, it comes with a collar. The collar can only be unlocked with the key that is given with the puppy. Be sure to keep it well as you will need it to interact with the dog!
+
+Features:
+
+- Adopt a dog!
+- Let the world know that you are looking to breed your dog by generating a proposal!
+- Approve the proposal!
+- Bring new pup to the world!
+
+In the background, Pawgenics utilize asymmetric encryption to validate the dog authenticity.
 
 ## Dev Setup
 
