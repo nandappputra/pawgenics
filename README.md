@@ -62,3 +62,11 @@ or run based on the built application using:
 ```bash
 npm run preview
 ```
+
+## How to Deploy
+
+To deploy the application to the github pages, use:
+
+```bash
+./deploy.sh
+```

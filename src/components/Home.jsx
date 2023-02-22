@@ -7,7 +7,7 @@ const Home = () => {
       <Row className="justify-content-md-center">
         <Col md="auto">
           <img
-            src="/logo.svg"
+            src="./logo.svg"
             width="100"
             height="100"
             className="text-center"
