@@ -1,6 +1,6 @@
 # Pawgenics
 
-Pawgenics is a web browser game where you can adopt and breed your own digital puppies.
+Pawgenics is a web browser game where you can adopt and breed your own digital puppies. Try it now at [nandappputra.github.io/pawgenics](https://nandappputra.github.io/pawgenics/)
 
 When you adopt a puppy, it comes with a collar. The collar can only be unlocked with the key that is given with the puppy. Be sure to keep it well as you will need it to interact with the dog!
 
